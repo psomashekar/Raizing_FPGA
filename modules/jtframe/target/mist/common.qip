@@ -1,0 +1,24 @@
+# Common files to MiST, SiDi and NeptUNO
+
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) jtframe_mist_base.v            ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) jtframe_mist_clocks.v          ]
+set_global_assignment -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) osd.sv                         ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/sound/hybrid_pwm_sd.v       ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/sound/hifi_1bit_dac.v       ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/clocking/jtframe_sync.v     ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/clocking/jtframe_rst_sync.v     ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) rgb2ypbpr.v                    ]
+
+# PLLs
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) pllgame/jtframe_pllgame.qip      ]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) pllgame96/jtframe_pllgame96.qip  ]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) pll6000/jtframe_pll6000.qip ]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) pll6144/jtframe_pll6144.qip ]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) pll6293/jtframe_pll6293.qip ]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) pll6671/jtframe_pll6671.qip ]
+
+# Constraints
+set_global_assignment -name SDC_FILE           [file join $::quartus(qip_path) mist_io.sdc    ]
+
+# JTFRAME scan doubler for memory constrained systems
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/video/jtframe_scan2x.v  ]

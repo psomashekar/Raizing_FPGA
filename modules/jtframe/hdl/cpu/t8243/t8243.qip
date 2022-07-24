@@ -1,0 +1,5 @@
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) t8243_sync_notri-c.vhd    ]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) t8243_sync_notri.vhd      ]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) t8243_comp_pack-p.vhd     ]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) t8243_core-c.vhd          ]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) t8243_core.vhd            ]

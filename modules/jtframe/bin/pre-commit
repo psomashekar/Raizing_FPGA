@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if ( git status -b -s -u no | grep behind > /dev/null ); then
+	echo "Your work tree is behind the remote branch"
+	echo "Pull your work before committing to avoid a merge"
+	echo "or create a local branch to do the merge"
+	exit 1
+fi
+
+exit 0
+

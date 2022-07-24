@@ -1,0 +1,20 @@
+#cpu
+set_global_assignment -name SYSTEMVERILOG_FILE modules/fx68k/fx68k.sv
+set_global_assignment -name SYSTEMVERILOG_FILE modules/fx68k/fx68kAlu.sv
+set_global_assignment -name SYSTEMVERILOG_FILE modules/fx68k/uaddrPla.sv
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/cpu/jtframe_68kdma.v
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/cpu/jtframe_68kdtack.v
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/cpu/jtframe_virq.v
+
+#video
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/video/jtframe_blank.v
+
+#clocking
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/clocking/jtframe_cen48.v
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/clocking/jtframe_cen96.v
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/clocking/jtframe_frac_cen.v
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/clocking/jtframe_cendiv.v
+
+#sound
+set_global_assignment -name QIP_FILE modules/jt51/hdl/jt51.qip
+set_global_assignment -name QIP_FILE modules/jt6295/hdl/jt6295.qip

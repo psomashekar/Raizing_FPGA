@@ -1,0 +1,24 @@
+#!/bin/bash
+
+CON=$((RANDOM%8))
+OPMASK=0
+while [ $OPMASK -eq 0 ]
+do
+	OPMASK=$((RANDOM%16))
+done
+TL=$((RANDOM%10))
+FL=$((RANDOM%8))
+
+echo go CON $CON OPMASK $OPMASK TL $TL FL $FL $*
+if go CON $CON OPMASK $OPMASK TL $TL FL $FL $* > test_fl.temp
+then
+	echo TEST PASS
+	exit 0
+else
+	echo TEST FAIL
+	#echo Use command:
+	#echo go CON $CON OPMASK $OPMASK TL $TL FL $FL $*
+	exit 1
+fi
+
+

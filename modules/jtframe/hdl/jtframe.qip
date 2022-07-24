@@ -1,0 +1,63 @@
+#board
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_board.v             ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_debug.v             ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_led.v               ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_enlarger.v          ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_reset.v             ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_uart.v              ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_dip.v               ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_sh.v                ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_ff.v                ]
+
+#keyboard
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) keyboard/jtframe_keyboard.v ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) keyboard/jtframe_4wayjoy.v  ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) keyboard/jtframe_inputs.v   ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) keyboard/jtframe_mouse.v   ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) keyboard/jtframe_paddle.v   ]
+
+set_global_assignment -name VHDL_FILE    [file join $::quartus(qip_path) keyboard/ps2_intf.vhd       ]
+
+#video
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) video/jtframe_resync.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) video/jtframe_credits.v     ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) video/jtframe_wirebw.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) video/jtframe_vtimer.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) video/jtframe_linebuf.v      ]
+
+#sdram
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_sdram.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_sdram64.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_sdram64_bank.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_sdram64_init.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_sdram64_rfsh.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_sdram64_latch.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_ram_2slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_ram_3slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_ram_4slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_ram_5slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_ram2_6slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_rom_1slot.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_rom_2slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_rom_3slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_rom_4slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_rom_5slots.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_romrq.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_rom.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_ram_rq.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sdram/jtframe_rom_sync.v]
+
+#ram
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ram/jtframe_dual_ram.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ram/jtframe_dual_nvram.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ram/jtframe_dual_ram16.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ram/jtframe_prom.v   ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ram/jtframe_ram.v   ]
+
+#sound
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) cpu/jtframe_z80.v    ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtframe_z80wait.v    ]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) sound/jtframe_uprate2_fir.qip      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sound/jtframe_mixer.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) sound/jtframe_fir_mono.v      ]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) cpu/t80/T80.qip    ]

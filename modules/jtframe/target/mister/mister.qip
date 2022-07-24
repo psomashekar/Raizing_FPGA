@@ -1,0 +1,26 @@
+set_global_assignment -name QIP_FILE           [file join $::quartus(qip_path) ../../hdl/jtframe.qip                 ]
+
+set_global_assignment -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) jtframe_emu.sv              ]
+set_global_assignment -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) jtframe_mister.sv           ]
+set_global_assignment -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) jtframe_mister_dwnld.v      ]
+set_global_assignment -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) jtframe_mr_ddrmux.v         ]
+set_global_assignment -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) jtframe_joymux.v            ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/sdram/jtframe_shadow.v ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/video/jtframe_hsize.v  ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/clocking/jtframe_rst_sync.v ]
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) ../../hdl/clocking/jtframe_sync.v     ]
+
+# Sys (MiSTer framework)
+set_global_assignment -name QIP_FILE           [file join $::quartus(qip_path) sys/sys.qip                 ]
+# set_global_assignment -name QIP_FILE           [file join $::quartus(qip_path) custom-sys.qip                 ]
+# set_global_assignment -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) sys/osd.sv                     ]
+# set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) sys/arcade_video.v             ]
+
+# PLLs
+set_global_assignment -name QIP_FILE [ file join $::quartus(qip_path) sys/pll.qip             ]
+set_global_assignment -name QIP_FILE [ file join $::quartus(qip_path) pll6144/jtframe_pll6144.qip       ]
+set_global_assignment -name QIP_FILE [ file join $::quartus(qip_path) pll6293/jtframe_pll6293.qip       ]
+set_global_assignment -name QIP_FILE [ file join $::quartus(qip_path) pll6671/jtframe_pll6671.qip       ]
+
+# DB15 support (Antonio Villena's MiSTer)
+set_global_assignment -name VERILOG_FILE       [file join $::quartus(qip_path) joydb15.v                   ]

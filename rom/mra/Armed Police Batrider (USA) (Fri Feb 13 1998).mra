@@ -1,0 +1,64 @@
+<misterromdescription>
+    <about author="pram0d" webpage="https://pram0d.com" source="https://github.com/psomashekar" twitter="@pr4m0d"/>
+    <name>Armed Police Batrider (USA) (Fri Feb 13 1998)</name>
+    <setname>batrideru</setname>
+    <rbf>batrider</rbf>
+    <mameversion>0229</mameversion>
+    <year>1998</year>
+    <manufacturer>Eighting / Raizing</manufacturer>
+    <players>2</players>
+    <joystick>8-way</joystick>
+    <rotation>vertical</rotation>
+    <region>USA</region>
+    <platform>Toaplan 2</platform>
+    <category>Shoot&apos;em up</category>
+    <catver>Shooter / Flying Vertical</catver>
+    <mraauthor>pram0d</mraauthor>
+    <rom index="0" zip="batrideru.zip" type="merged" md5="none" address="0x30000000">
+        <!-- maincpu -->
+        <interleave output="16">
+            <part name="prg0_usa.u22" crc="2049d007" map="01"/>
+            <part name="prg1b.u23" crc="8e70b492" map="10"/>   
+        </interleave>
+        <interleave output="16">
+            <part name="prg2.u21" crc="bdaa5fbf" map="01"/>
+            <part name="prg3.u24" crc="7aa9f941" map="10"/>
+        </interleave>
+        <!-- audiocpu -->
+        <interleave output="8">
+            <part name="snd.u77" crc="56682696" map="01"/>
+        </interleave>
+        <!--  gfx1 -->
+        <interleave output="16">
+            <part name="rom-1.bin" crc="0df69ca2" map="01"/>
+            <part name="rom-2.bin" crc="1bfea593" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="rom-3.bin" crc="60167d38" map="01"/>
+            <part name="rom-4.bin" crc="bee03c94" map="10"/>
+        </interleave>
+        <!-- oki -->
+            <part name="rom-5.bin" crc="4274daf6"/>
+            <part name="rom-6.bin" crc="2a1c2426"/>
+    </rom>
+    <!-- Vertical game -->
+    <rom index="1">
+        <part>01</part>
+    </rom>
+    <switches default="00,00,00" base="8">
+        <dip bits="0" name="Test Mode" ids="Off, On"/>
+        <dip bits="1" name="Starting Coin" ids="1 Credit, 2 Credits"/>
+        <dip bits="2,4" name="Coin 1" ids="1 Coin/1 Credit, 1 Coin/2 Credits, 1 Coin/3 Credits, 1 Coin/4 Credits, 2 Coins/1 Credit, 3 Coins/1 Credit, 4 Coins/1 Credit, Free Play"/>
+        <dip bits="5,7" name="Coin 2" ids="1 Coin/1 Credit, 1 Coin/2 Credits, 1 Coin/3 Credits, 1 Coin/4 Credits, 2 Coins/1 Credit, 3 Coins/1 Credit, 4 Coins/1 Credit, Free Play"/>
+        <dip bits="8,9" name="Start Rank" ids="Normal, Easy, Hard, Very Hard"/>
+        <dip bits="10,11" name="Timer Rank" ids="Normal, Low, High, Highest"/>
+        <dip bits="12,13" name="Player Counts" ids="3, 4, 2, 1"/>
+        <dip bits="14,15" name="Extra Player" ids="1.5mil Each, 1mil Each, 2mil Each, No Extra"/>
+        <dip bits="16" name="Screen Flip" ids="Off, On"/>
+        <dip bits="17" name="Demo Sound" ids="On, No Sound"/>
+        <dip bits="18" name="Stage Edit" ids="Disable, Enable"/>
+        <dip bits="19" name="Continue Play" ids="Enable, Disable"/>
+        <dip bits="20" name="Invincible" ids="Off, On"/>
+    </switches>
+    <buttons names="Shot,Bomb,Formation,Coin,Start" default="Y,A,B,Select,Start" count="3"/>
+</misterromdescription>
