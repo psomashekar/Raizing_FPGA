@@ -70,40 +70,52 @@ module jtframe_68kdtack
 localparam CW=W+WD;
 
 reg [CW-1:0] cencnt=0;
-reg          wait1; //, aux=0;
-wire         halt;
+reg wait1, halt=0, aux=0;
 wire [W-1:0] num2 = { num, 1'b0 }; // num x 2
-wire over = cencnt>den-num2;
-reg  [CW:0] cencnt_nx;
-reg  risefall=0;
+wire over = (cencnt>den-num2)
+            && !cpu_cen /*&& !aux*/ && (!halt || RECOVERY==0);
+reg  DSnl;
+reg  cen_act=0, risefall=0;
+wire DSn_posedge = &DSn & ~DSnl;
 
-assign halt = RECOVERY==1 && !ASn && !wait1 && (bus_cs && bus_busy && !bus_legit);
+`ifdef SIMULATION
+real rnum = num2;
+real rden = den;
+initial begin
+    if( rnum/rden<=4 ) begin
+        $display("Error: num2/den must be 4 or more, otherwise recovery won't work (%m)");
+        $finish;
+    end
+end
+`endif
 
 always @(posedge clk) begin : dtack_gen
     if( rst ) begin
         DTACKn <= 1;
         wait1  <= 1;
+        halt   <= 0;
     end else begin
-        if( ASn | &DSn ) begin // DSn is needed for read-modify-write cycles
-               // performed on the SDRAM. Just checking the DSn rising edge
-               // is not enough on Rastan
+        DSnl <= &DSn;
+        if( ASn || DSn_posedge ) begin // DSn is needed for read-modify-write cycles
             DTACKn <= 1;
             wait1  <= 1;
-        end else if( !ASn && cpu_cen ) begin
-            wait1 <= 0;
-            if( !wait1 && (!bus_cs || (bus_cs && !bus_busy)) ) begin
-                DTACKn <= 0;
+            halt   <= 0;
+        end else if( !ASn ) begin
+            if( cpu_cen  ) wait1 <= 0;
+            if( !wait1 || cpu_cen ) begin
+                if( !bus_cs || (bus_cs && !bus_busy) ) begin
+                    DTACKn <= 0;
+                    halt <= 0;
+                end else begin
+                    halt <= !bus_legit;
+                end
             end
         end
     end
 end
 
-always @* begin
-    cencnt_nx = over && !halt ? {1'b0,cencnt}+num2-den : { 1'b0, cencnt} +num2;
-end
-
 always @(posedge clk) begin
-    cencnt  <= cencnt_nx[CW] ? {CW{1'b1}} : cencnt_nx[CW-1:0];
+    cencnt  <= over ? (cencnt+num2-den) : (cencnt+num2);
     if( over && !halt) begin
         cpu_cen  <= risefall;
         cpu_cenb <= ~risefall;
@@ -112,7 +124,7 @@ always @(posedge clk) begin
         cpu_cen  <= 0;
         cpu_cenb <= 0;
     end
-    // aux <= cpu_cen; // forces a blank after cpu_cen,
+    aux <= cpu_cen; // forces a blank after cpu_cen,
     // so the shortest sequence is cpu_cen, blank, cpu_cenb
     // note that cpu_cen can follow cpu_cenb without a blank
 end
@@ -125,7 +137,7 @@ initial fworst = 16'hffff;
 always @(posedge clk) begin
     freq_cnt <= freq_cnt + 1'd1;
     if(cpu_cen) fout_cnt<=fout_cnt+1'd1;
-    if( freq_cnt == MFREQ-1 ) begin // updated every 1ms
+    if( freq_cnt == MFREQ-1 ) begin
         freq_cnt <= 0;
         fout_cnt <= 0;
         fave <= fout_cnt;
