@@ -23,6 +23,9 @@ The garegga core will play Sorcer Striker & Kingdom Grandprix as well.
 
 It is a matter of loading up the project in quartus, and synthesizing/ building to get the rbf which you can put on your sd card for MiSTer.
 
+Note:
+- the JT9346 I have in Bakraid is not compatible with 93C66 chips, I made some changes to make it compatible.
+- the YMZ280b module comes from Nullobject, I have isolated and generated the module as standalone in scala, which emits verilog. No changes.
 ## License
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
