@@ -1,7 +1,7 @@
 <misterromdescription>
     <about author="pram0d" webpage="https://pram0d.com" source="https://github.com/psomashekar" twitter="@pr4m0d"/>
-    <name>Armed Police Batrider (USA) (Fri Feb 13 1998)</name>
-    <setname>batrideru</setname>
+    <name>Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)</name>
+    <setname>batriderja</setname>
     <rbf>batrider</rbf>
     <mameversion>0245</mameversion>
     <year>1998</year>
@@ -9,16 +9,16 @@
     <players>2</players>
     <joystick>8-way</joystick>
     <rotation>vertical</rotation>
-    <region>USA</region>
+    <region>Japan</region>
     <platform>Toaplan 2</platform>
     <category>Shoot'em up</category>
     <catver>Shooter / Flying Vertical</catver>
     <mraauthor>pram0d, atrac17</mraauthor>
-    <rom index="0" zip="batrideru.zip|batrider.zip" md5="None" address="0x30000000">
+    <rom index="0" zip="batriderja.zip|batrider.zip" md5="None" address="0x30000000">
         <!-- maincpu - starts at 0x0 -->
         <interleave output="16">
-            <part name="prg0_usa.u22" crc="2049d007" map="01"/>
-            <part name="prg1b.u23" crc="8e70b492" map="10"/>
+            <part name="prg0.bin" crc="f93ea27c" map="01"/>
+            <part name="prg1.u23" crc="8ae7f592" map="10"/>
         </interleave>
         <interleave output="16">
             <part name="prg2.u21" crc="bdaa5fbf" map="01"/>

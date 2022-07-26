@@ -304,7 +304,7 @@ always @(posedge CLK96) begin
                    sel_vram ? main_vram_q1 ://ram reads
                    sel_zrom ? Z80_PRG_DATA : // z80 program
                    read_port_in_r_cs ? {p2_ctrl, p1_ctrl} : //controller inputs
-                   read_port_sys_dsw_r_cs ? {DIPSW_C, 1'b0, ~COIN_INPUT[1], ~COIN_INPUT[0], ~START_BUTTON[1], ~START_BUTTON[0], 1'b0, 1'b0, ~SERVICE} : //dip switch c/ coins
+                   read_port_sys_dsw_r_cs ? {DIPSW_C, 1'b0, ~START_BUTTON[1], ~START_BUTTON[0], ~COIN_INPUT[1], ~COIN_INPUT[0], ~DIP_TEST, 1'b0, ~SERVICE} : //dip switch c/ coins
                    read_port_dsw_r_cs ? {DIPSW_B, DIPSW_A} : //dip switch a and b.
                    video_count_r_cs ? video_status : // blanking trigger
                    soundlatch3_r_cs ? SOUNDLATCH3 : //soundlatch3
