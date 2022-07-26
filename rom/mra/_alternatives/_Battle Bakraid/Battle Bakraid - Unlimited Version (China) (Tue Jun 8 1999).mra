@@ -1,7 +1,7 @@
 <misterromdescription>
     <about author="pram0d" webpage="https://pram0d.com" source="https://github.com/psomashekar" twitter="@pr4m0d"/>
-    <name>Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)</name>
-    <setname>bbakraid</setname>
+    <name>Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)</name>
+    <setname>bbakraidc</setname>
     <rbf>bakraid</rbf>
     <mameversion>0245</mameversion>
     <year>1999</year>
@@ -9,15 +9,15 @@
     <players>2</players>
     <joystick>8-way</joystick>
     <rotation>vertical</rotation>
-    <region>USA</region>
+    <region>World</region>
     <platform>Toaplan 2</platform>
     <category>Shoot'em up</category>
     <catver>Shooter / Flying Vertical</catver>
     <mraauthor>pram0d, atrac17</mraauthor>
-    <rom index="0" zip="bbakraid.zip" md5="None" address="0x30000000">
+    <rom index="0" zip="bbakraidc.zip|bbakraid.zip" md5="None" address="0x30000000">
         <!-- maincpu - starts at 0x0 -->
         <interleave output="16">
-            <part name="prg0u022_usa.bin" crc="95fb2ffd" map="01"/>
+            <part name="prg0u022_china.bin" crc="760be084" map="01"/>
             <part name="prg1u023.new" crc="4ae9aa64" map="10"/>
         </interleave>
         <interleave output="16">

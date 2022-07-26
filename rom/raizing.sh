@@ -53,7 +53,7 @@ function mra {
         -buttons $BUTSTR
 }
 
-mra  batrider "Armed Police Batrider"  "Shot,Bomb,Formation" "FC,00,E0,E1,FF,FF,FF,FF"
+mra  batrider "Armed Police Batrider"  "Shot,Bomb,Formation" "00,00,00"
 
 function mra {
     local GAME=$1
@@ -74,7 +74,8 @@ function mra {
     echo -----------------------------------------------
     echo "Dumping $GAME"
     mame2dip xml/$GAME.xml -rbf bakraid -outdir $OUTDIR -altfolder "$ALTD" \
-        -order maincpu audiocpu gp9001_0 oki1 oki2 \
+        -order maincpu audiocpu gp9001_0 ymz \
+        -ignore eeprom \
         -dipbase 8 \
         -start maincpu    0x0       \
         -start audiocpu   0x200000  \
@@ -85,6 +86,7 @@ function mra {
         -setword gp9001_0 16 reverse \
         -frac 1 gp9001_0 2 \
         -order-roms gp9001_0 0 2 1 3 \
+        -nvram 512 \
         -dipdef $DIP \
         -corebuttons 3 \
         -buttons $BUTSTR
