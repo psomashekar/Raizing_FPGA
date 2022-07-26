@@ -68,50 +68,65 @@ set_instance_assignment -name FAST_INPUT_REGISTER ON -to "emu:emu|jtframe_mister
 set_instance_assignment -name FAST_OUTPUT_ENABLE_REGISTER ON -to SDRAM_DQ[*]
 set_global_assignment -name FORCE_SYNCH_CLEAR ON
 
+### JTFRAME TARGET
 set_global_assignment -name VERILOG_MACRO "CORENAME=BATRIDER"
+set_global_assignment -name VERILOG_MACRO "GAMETOP=batrider_game"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_RELEASE=1"
+set_global_assignment -name VERILOG_MACRO "TARGET=mister"
 set_global_assignment -name VERILOG_MACRO "BATRIDER=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_COLORW=8"
-set_global_assignment -name VERILOG_MACRO "COMMIT=c736b2f-dirty"
-set_global_assignment -name VERILOG_MACRO "CORE_OSD=OD,Turbo,Off,On;"
-set_global_assignment -name VERILOG_MACRO "DATE=211101"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_AUTOPRECH=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_AUTOPRECH=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_AUTOPRECH=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_AUTOPRECH=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_LEN=64"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_LEN=64"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_LEN=64"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_LEN=64"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BUTTONS=3"
+
+### Clock Inputs
 set_global_assignment -name VERILOG_MACRO "JTFRAME_CLK48=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_CLK96=1"
-set_global_assignment -name VERILOG_MACRO "VIDEO_HEIGHT=240"
+
+### SDRAM parameters
+set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM96=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_BANKS=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_REPACK=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_NOHOLDBUS=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_AUTOPRECH=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_AUTOPRECH=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_AUTOPRECH=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_AUTOPRECH=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_LEN=64"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_LEN=64"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_LEN=64"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_LEN=64"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_CHECK=1"
+
+### NVRAM parameters
 set_global_assignment -name VERILOG_MACRO "JTFRAME_IOCTL_RD=128"
+
+### Screen parameters
+set_global_assignment -name VERILOG_MACRO "JTFRAME_COLORW=8"
+set_global_assignment -name VERILOG_MACRO "VIDEO_WIDTH=320"
+set_global_assignment -name VERILOG_MACRO "VIDEO_HEIGHT=240"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_VERTICAL=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_ROTATE=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_MR_ROTCCW=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_ARX=4"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_ARY=3"
+
+### Audio section
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_ADPCM=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_VOL=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_SND_EN=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_STEREO=1"
+set_global_assignment -name VERILOG_MACRO "STEREO_GAME=1"
+
+### PCB Configuration
+set_global_assignment -name VERILOG_MACRO "JTFRAME_BUTTONS=3"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_MR_DDRLOAD=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_MR_FASTIO=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_MRA_DIP=1"
+
+### OSD Options
 set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_NOCREDITS=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_NOLOAD=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_NOLOGO=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM96=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_BANKS=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_MR_FASTIO=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_TIMESTAMP=1635780305"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_VERTICAL=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_ADPCM=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_VOL=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_SND_EN=1"
-set_global_assignment -name VERILOG_MACRO "VIDEO_WIDTH=320"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_ROTATE=1"
-set_global_assignment -name VERILOG_MACRO "NOCREDITS=1"
 set_global_assignment -name VERILOG_MACRO "SEPARATOR=-;"
-set_global_assignment -name VERILOG_MACRO "STEREO_GAME=1"
-set_global_assignment -name VERILOG_MACRO "TARGET=mister"
-set_global_assignment -name VERILOG_MACRO "GAMETOP=batrider_game"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_MRA_DIP=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_RELEASE=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_ARX=4"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_ARY=3"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_REPACK=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_MR_ROTCCW=1"
+set_global_assignment -name VERILOG_MACRO "DATE=20220726"
+#set_global_assignment -name VERILOG_MACRO "NOCREDITS=1"
 
 set_global_assignment -name SEED 1
 
