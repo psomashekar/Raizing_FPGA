@@ -90,11 +90,11 @@ wire [17:0] oki0_pcm_addr;
 `endif
 
 wire [7:0] 
-fmgain = GAME == SSTRIKER ? 8'h0F :
-         8'h0F, 
-pcmgain = GAME == GAREGGA ? 8'h0F : 
-          GAME == SSTRIKER ? 8'h0F :
-          8'h0F;
+fmgain = GAME == SSTRIKER ? 8'hB3 :
+         8'h7F, 
+pcmgain = GAME == GAREGGA ? 8'hFF : 
+          GAME == SSTRIKER ? 8'hB3 :
+          8'h7F;
 always @(posedge CLK) begin
     peak <= peak_l | peak_r;
 end
