@@ -97,7 +97,7 @@ always @(posedge CLK96, posedge RESET96) begin
     end
 end
 
-localparam [7:0] pcmgain = 8'hFF;
+localparam [7:0] pcmgain = 8'h10;
 always @(posedge CLK96) begin
     peak <= peak_l | peak_r;
 end

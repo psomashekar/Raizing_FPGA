@@ -88,7 +88,7 @@ wire [17:0] oki0_pcm_addr, oki1_pcm_addr;
  initial fd = $fopen("logsound.txt", "w");
 `endif
 
-localparam [7:0] fmgain = 8'hB3, pcmgain = 8'hB3;
+localparam [7:0] fmgain = 8'h10, pcmgain = 8'h10;
 always @(posedge CLK96) begin
     peak <= peak_l | peak_r;
 end
