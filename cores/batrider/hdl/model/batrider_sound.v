@@ -53,7 +53,8 @@ module batrider_sound (
     output reg     [7:0] SOUNDLATCH3,
     output reg     [7:0] SOUNDLATCH4,
     input          [7:0] SOUNDLATCH,
-    input          [7:0] SOUNDLATCH2
+    input          [7:0] SOUNDLATCH2,
+    input          [1:0] FX_LEVEL
 );
 
 // assign ACK = 1'b1;
@@ -104,8 +105,8 @@ jtframe_mixer #(.W0(16), .W1(14), .W2(14), .WOUT(16)) u_mix_left(
     .ch3    ( 16'd0     ),
     // gain for each channel in 4.4 fixed point format
     .gain0  ( fmgain    ),
-    .gain1  ( pcmgain   ),
-    .gain2  ( pcmgain     ),
+    .gain1  ( pcmgain + (FX_LEVEL<<1)   ),
+    .gain2  ( pcmgain + (FX_LEVEL<<1)    ),
     .gain3  ( 8'd0     ),
     .mixed  ( left      ),
     .peak   ( peak_l    )
@@ -122,8 +123,8 @@ jtframe_mixer #(.W0(16), .W1(14), .W2(14), .WOUT(16)) u_mix_right(
     .ch3    ( 16'd0   ),
     // gain for each channel in 4.4 fixed point format
     .gain0  ( fmgain    ),
-    .gain1  ( pcmgain   ),
-    .gain2  ( pcmgain    ),
+    .gain1  ( pcmgain + (FX_LEVEL<<1)   ),
+    .gain2  ( pcmgain + (FX_LEVEL<<1)   ),
     .gain3  ( 8'd0    ),
     .mixed  ( right     ),
     .peak   ( peak_r    )

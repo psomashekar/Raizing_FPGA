@@ -55,7 +55,8 @@ module bakraid_sound (
     output reg     [7:0] SOUNDLATCH3,
     output reg     [7:0] SOUNDLATCH4,
     input          [7:0] SOUNDLATCH,
-    input          [7:0] SOUNDLATCH2
+    input          [7:0] SOUNDLATCH2,
+    input          [1:0] FX_LEVEL
 );
 
 // assign ACK = 1'b1;
@@ -112,8 +113,8 @@ jtframe_mixer #(.W0(16), .W1(16), .WOUT(16)) u_mix_left(
     .ch2    ( 16'd0 ),
     .ch3    ( 16'd0     ),
     // gain for each channel in 4.4 fixed point format
-    .gain0  ( pcmgain    ),
-    .gain1  ( pcmgain   ),
+    .gain0  ( pcmgain + (FX_LEVEL<<1)    ),
+    .gain1  ( pcmgain + (FX_LEVEL<<1)   ),
     .gain2  ( 8'd0     ),
     .gain3  ( 8'd0     ),
     .mixed  ( left      ),

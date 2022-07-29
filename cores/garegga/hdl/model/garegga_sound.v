@@ -52,7 +52,8 @@ module garegga_sound (
     output               SRAM_WE,
 
     input          [7:0] OKI_BANK,
-    input          [7:0] GAME
+    input          [7:0] GAME,
+    input          [1:0] FX_LEVEL
 );
 
 localparam GAREGGA = 'h0, KINGDMGP = 'h2, SSTRIKER = 'h1;
@@ -110,7 +111,7 @@ jtframe_mixer #(.W0(16), .W1(14), .WOUT(16)) u_mix_left(
     .ch3    ( 16'd0     ),
     // gain for each channel in 4.4 fixed point format
     .gain0  ( fmgain    ),
-    .gain1  ( pcmgain   ),
+    .gain1  ( pcmgain + (FX_LEVEL<<1)),
     .gain2  ( 8'd0     ),
     .gain3  ( 8'd0     ),
     .mixed  ( left      ),
@@ -128,7 +129,7 @@ jtframe_mixer #(.W0(16), .W1(14), .WOUT(16)) u_mix_right(
     .ch3    ( 16'd0   ),
     // gain for each channel in 4.4 fixed point format
     .gain0  ( fmgain    ),
-    .gain1  ( pcmgain   ),
+    .gain1  ( pcmgain + (FX_LEVEL<<1)),
     .gain2  ( 8'd0    ),
     .gain3  ( 8'd0    ),
     .mixed  ( right     ),
