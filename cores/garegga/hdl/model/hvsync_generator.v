@@ -44,9 +44,9 @@ module hvsync_generator(clk, clk96, pxl_cen, reset, reset96, hsync, vsync, displ
 jtframe_vtimer #(
   .V_START(0),
   .VB_START(239),
-  .VB_END(261),
+  .VB_END(262),
   .VS_START(244),
-  // .VS_END(253),
+  .VS_END(248),
   .HB_END(431),
   .HB_START(319),
   .HS_START(360),
