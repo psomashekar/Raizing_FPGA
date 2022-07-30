@@ -127,7 +127,12 @@ module garegga_gcu (
     output [21:0] GFX0SCR2_ADDR,
     input  [31:0] GFX0SCR2_DOUT,
 
-    input [7:0] GAME
+    input [7:0] GAME,
+
+    input   [8:0] HS_START,
+    input   [8:0] HS_END,
+    input   [8:0] VS_START,
+    input   [8:0] VS_END
 );
 
 localparam GAREGGA = 'h0, KINGDMGP = 'h2, SSTRIKER = 'h1;
@@ -158,8 +163,8 @@ wire signed [12:0] sprite_scroll_yoffs = GAME == KINGDMGP || GAME == SSTRIKER ? 
 wire signed [12:0] sprite_scroll_yoffs_f = -12'h108;
 
 //blanking signal generation
-assign HSYNC = H > 325 && H < 380 ? 0 : 1;
-assign VSYNC = V >= 232 && V <= 245 ? 0 : 1;
+assign HSYNC = H > HS_START && H < HS_END ? 0 : 1;
+assign VSYNC = V >= VS_START && V <= VS_END ? 0 : 1;
 assign FBLANK = !HSYNC || !VSYNC ? 0 : 1;
 
 //ram pointer
