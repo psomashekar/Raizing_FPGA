@@ -135,7 +135,12 @@ module bakraid_gcu (
     output [21:0] GFX0SCR2_ADDR,
     input  [31:0] GFX0SCR2_DOUT,
     output [21:0] GFX1SCR2_ADDR,
-    input  [31:0] GFX1SCR2_DOUT
+    input  [31:0] GFX1SCR2_DOUT,
+
+    input   [8:0] HS_START,
+    input   [8:0] HS_END,
+    input   [8:0] VS_START,
+    input   [8:0] VS_END
 );
 
 //debugging 
@@ -163,8 +168,8 @@ wire        [12:0] sprite_scroll_yoffs = 12'h001; //-12'h1EF;
 wire signed [12:0] sprite_scroll_yoffs_f = -12'h108;
 
 //blanking signal generation
-assign HSYNC = H > 325 && H < 380 ? 0 : 1;
-assign VSYNC = V >= 232 && V <= 245 ? 0 : 1;
+assign HSYNC = H > HS_START && H < HS_END ? 0 : 1;
+assign VSYNC = V >= VS_START && V <= VS_END ? 0 : 1;
 assign FBLANK = !HSYNC || !VSYNC ? 0 : 1;
 
 //ram pointer

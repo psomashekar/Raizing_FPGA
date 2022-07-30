@@ -214,10 +214,8 @@ always @(posedge CLK96, posedge RESET96) begin
         last_HB    <= HB;
         c<=c+1;
 
-        if( pedg_HB && !VB ) begin
+        if( (pedg_HB && !VB)  || VRENDER == 0 ) begin
             start <= 1'b1;
-            // $display("%d", c);
-            c<=0;
         end
 
         if(start && !busy) begin
