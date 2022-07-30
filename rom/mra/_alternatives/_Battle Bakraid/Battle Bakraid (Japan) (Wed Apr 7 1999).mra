@@ -52,13 +52,13 @@
     <switches page_id="1" page_name="Switches" base="8" default="00,00,00">
         <!-- DSW -->
         <dip name="Test Mode" bits="0" ids="Off,On"/>
-        <dip name="Starting Coin" bits="1" ids="1,2"/>
+        <!-- dip name="Starting Coin" bits="1" ids="1,2"/ -->
         <dip name="Joystick Mode" bits="1" ids="Normal,Special"/>
-        <dip name="Coin 1" bits="2,4" ids="1/1,1/2,1/3,1/4,2/1,3/1,4/1,Free Play"/>
+        <dip name="Coins" bits="2,4" ids="1/1,1/2,1/3,1/4,2/1,3/1,4/1,Free Play"/>
         <dip name="Hit Score" bits="5" ids="Off,On"/>
         <dip name="Sound Effect" bits="6" ids="Off,On"/>
         <dip name="Music" bits="7" ids="Off,On"/>
-        <dip name="Coin 2" bits="5,7" ids="1/1,1/2,1/3,1/4,2/1,3/1,4/1"/>
+        <!-- dip name="Coin 2" bits="5,7" ids="1/1,1/2,1/3,1/4,2/1,3/1,4/1"/ -->
         <dip name="Start Rank" bits="8,9" ids="Normal,Easy,Hard,Very Hard"/>
         <dip name="Timer Rank" bits="10,11" ids="Normal,Low,High,Highest"/>
         <dip name="Player Counts" bits="12,13" ids="3,4,2,1"/>

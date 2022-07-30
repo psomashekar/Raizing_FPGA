@@ -81,9 +81,7 @@ set_global_assignment -name VERILOG_MACRO "JTFRAME_CLK96=1"
 
 ### SDRAM parameters
 set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM96=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_BANKS=0"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_REPACK=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_NOHOLDBUS=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_BANKS=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_AUTOPRECH=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_AUTOPRECH=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_AUTOPRECH=1"
@@ -92,6 +90,9 @@ set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_LEN=64"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_LEN=64"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_LEN=64"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_LEN=64"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_REPACK=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_NOHOLDBUS=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_LARGE=1"
 #set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_LARGE=1"
 
 ### NVRAM parameters
@@ -108,10 +109,9 @@ set_global_assignment -name VERILOG_MACRO "JTFRAME_ARX=4"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_ARY=3"
 
 ### Audio section
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_ADPCM=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_VOL=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_SND_EN=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_STEREO=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_ADPCM=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_VOL=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_SND_EN=1"
 set_global_assignment -name VERILOG_MACRO "STEREO_GAME=1"
 
 ### PCB Configuration
