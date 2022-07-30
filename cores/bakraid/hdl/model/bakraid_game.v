@@ -493,7 +493,8 @@ bakraid_sound u_sound(
     .left(snd_left),
     .right(snd_right),
     .sample(sample),
-    .peak(peak)
+    .peak(peak),
+    .FX_LEVEL(dip_fxlevel)
 );
 
 //sdram

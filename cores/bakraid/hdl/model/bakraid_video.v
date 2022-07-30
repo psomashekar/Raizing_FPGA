@@ -96,7 +96,12 @@ module bakraid_video (
     output  [8:0] V,
     output  [7:0] RED,
     output  [7:0] GREEN,
-    output  [7:0] BLUE
+    output  [7:0] BLUE,
+
+    input   [8:0] HS_START,
+    input   [8:0] HS_END,
+    input   [8:0] VS_START,
+    input   [8:0] VS_END
 );
 
 wire ACTIVE;
@@ -459,7 +464,12 @@ bakraid_gcu u_gcu(
     .GFX0SCR2_ADDR(GFX0SCR2_ADDR),     
     .GFX0SCR2_DOUT(GFX0SCR2_DOUT),
     .GFX1SCR2_ADDR(GFX1SCR2_ADDR),     
-    .GFX1SCR2_DOUT(GFX1SCR2_DOUT)
+    .GFX1SCR2_DOUT(GFX1SCR2_DOUT),
+
+    .HS_START(HS_START),
+    .HS_END(HS_END),
+    .VS_START(VS_START),
+    .VS_END(VS_END)
 );
 
 

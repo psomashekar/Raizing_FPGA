@@ -88,7 +88,12 @@ module garegga_video (
     output  [7:0] GREEN,
     output  [7:0] BLUE,
 
-    input   [7:0] GAME
+    input   [7:0] GAME,
+
+    input   [8:0] HS_START,
+    input   [8:0] HS_END,
+    input   [8:0] VS_START,
+    input   [8:0] VS_END
 );
 
 wire ACTIVE;
@@ -444,7 +449,12 @@ garegga_gcu u_gcu(
     .GFX0SCR2_ADDR(GFX0SCR2_ADDR),     
     .GFX0SCR2_DOUT(GFX0SCR2_DOUT),
 
-    .GAME(GAME)
+    .GAME(GAME),
+
+    .HS_START(HS_START),
+    .HS_END(HS_END),
+    .VS_START(VS_START),
+    .VS_END(VS_END)
 );
 
 

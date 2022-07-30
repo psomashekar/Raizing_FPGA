@@ -26,12 +26,13 @@ To use:
 - Add a 3-bit (or more) "rgb" output to the top level
 */
 
-module hvsync_generator(clk, clk96, pxl_cen, reset, hsync, vsync, display_on, hpos, vpos, lhbl, lvbl, vrender);
+module hvsync_generator(clk, clk96, pxl_cen, reset, reset96, hsync, vsync, display_on, hpos, vpos, lhbl, lvbl, vrender, hs_start, hs_end, vs_start, vs_end);
 
   input clk;
   input clk96;
   input pxl_cen;
   input reset;
+  input reset96;
   output hsync, vsync;
   output display_on;
   output [8:0] hpos;
@@ -39,13 +40,19 @@ module hvsync_generator(clk, clk96, pxl_cen, reset, hsync, vsync, display_on, hp
   output lhbl, lvbl;
   output [8:0] vrender;
 
+  output [8:0] hs_start;
+  output [8:0] hs_end;
+  output [8:0] vs_start;
+  output [8:0] vs_end;
+
+
 
 jtframe_vtimer #(
   .V_START(0),
   .VB_START(239),
-  .VB_END(261),
+  .VB_END(262),
   .VS_START(244),
-  // .VS_END(253),
+  .VS_END(249),
   .HB_END(431),
   .HB_START(319),
   .HS_START(360),
@@ -61,6 +68,12 @@ jtframe_vtimer #(
   .vdump(vpos),
   .vrender(vrender)
 );
+
+//for gcu register vcount
+assign hs_start = 325;
+assign hs_end = 380;
+assign vs_start = 232;
+assign vs_end = 245;
 
 assign display_on = (hpos<320) && (vpos<240);
 

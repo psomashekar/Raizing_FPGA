@@ -214,10 +214,8 @@ always @(posedge CLK96, posedge RESET96) begin
         last_HB    <= HB;
         c<=c+1;
 
-        if( pedg_HB && !VB ) begin
+        if( (pedg_HB && !VB)  || (VRENDER == 0 && pedg_HB) ) begin
             start <= 1'b1;
-            // $display("%d", c);
-            c<=0;
         end
 
         if(start && !busy) begin
@@ -305,7 +303,7 @@ always @(posedge CLK96, posedge RESET96) begin
                                          pri_has_sprite[13] ? 13 :
                                          pri_has_sprite[14] ? 14 :
                                          pri_has_sprite[15] ? 15 :
-                                         16;
+                                         15;
                         end
                     end
                 end
@@ -319,28 +317,28 @@ always @(posedge CLK96, posedge RESET96) begin
                         xfl= GP9001RAM_GCU_DOUT[12]; //is x-flipped
                         priority_l= GP9001RAM_GCU_DOUT[11:8]; //get the sprite priority
 
-                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0];
+                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0]+1;
                         sprite_y_pos_t = !mc ? 
                                             (GP9001RAM2_GCU_DOUT[15:7] + SPRITE_SCROLL_Y + SPRITE_SCROLL_YOFFS) & 'h1FF :
                                             (multiconnector_y + GP9001RAM2_GCU_DOUT[15:7]) & 'h1FF;
                         
-                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t + 1) << 3);
+                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t) << 3);
                         
                         if(sprite_y_pos_t > 384) sprite_y_pos_t = sprite_y_pos_t - 'h200;
-                        
-                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + ((sprite_y_size_t + 1) << 3))) begin 
+
+                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + ((sprite_y_size_t) << 3))) begin 
                             sprite_y_size_t = sprite_y_size_t - (-sprite_y_pos_t>>3);
                             sprite_y_pos_t = 0;
                         end
 
                         
-                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + ((sprite_y_size_t + 1) << 3))) begin
-                            $display("queue: %d, %d, %d, %h, %h, %h", VRENDER, sprite_y_size_t, sprite_y_pos_t, sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8]+1, priority_l, spr[7:0]);
+                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + ((sprite_y_size_t) << 3))) begin
+                            $display("queue: %d, %d, %d, %h, %h, %h", VRENDER, sprite_y_size_t, sprite_y_pos_t, sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8], priority_l, spr[7:0]);
                             wr_spr_q <= spr[7:0];
                             wr_spr_q_addr<=((priority_l<<11) | sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]);
                             pri_has_sprite[priority_l]<=1'b1;
 
-                            sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8] <= sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]+1;
+                            sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8] <= (sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]+1);
                             sprite_queue_n<=sprite_queue_n+1;                            
                         end
 
@@ -406,7 +404,7 @@ always @(posedge CLK96, posedge RESET96) begin
                                          pri_has_sprite[13] ? 13 :
                                          pri_has_sprite[14] ? 14 :
                                          pri_has_sprite[15] ? 15 :
-                                         16;
+                                         15;
                         end else begin //if all is done, end
                             busy<=0;
                             start<=1'b0;
@@ -450,8 +448,8 @@ always @(posedge CLK96, posedge RESET96) begin
                     end   
                 end
                 12: begin
-                    $display("xpos: %d %d %d %d %d", sprite_x_pos, SPRITE_SCROLL_X, SPRITE_SCROLL_XOFFS, (sprite_attributes[31:23]+SPRITE_SCROLL_X+SPRITE_SCROLL_XOFFS) & 'h01FF, sprite_x_size);
-                    // $display("ypos: %d %d %d %d %d", sprite_attributes[15:7], SPRITE_SCROLL_Y, SPRITE_SCROLL_YOFFS, (sprite_attributes[15:7]+SPRITE_SCROLL_Y+SPRITE_SCROLL_YOFFS) & 'h01FF, sprite_y_size);
+                    //$display("xpos: %d %d %d %d %d %d", sprite_x_pos, SPRITE_SCROLL_X, SPRITE_SCROLL_XOFFS, (sprite_attributes[31:23]+SPRITE_SCROLL_X+SPRITE_SCROLL_XOFFS) & 'h01FF, sprite_x_size, priority_i);
+                    //  $display("ypos: %d %d %d %d %d %d", sprite_y_pos, SPRITE_SCROLL_Y, SPRITE_SCROLL_YOFFS, (sprite_y_pos+SPRITE_SCROLL_Y+SPRITE_SCROLL_YOFFS) & 'h01FF, sprite_y_size, priority_i);
                     
                     //process flips on x and y axis for sprite
                     multiconnector_x<=sprite_x_pos;
@@ -528,7 +526,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         TILE_NUMBER_OFFS<=0;
                         TILE_BANK<=0;
                         sprite_line<=GFX_DATA;
-                        $display("%d, %d, %d, %h, %h %h", VRENDER, sprite_x_pos, sprite_x_size, TILE_NUMBER, TILE_NUMBER_OFFS, GFX_DATA);
+                        // $display("%d, %d, %d, %h, %h %h", VRENDER, sprite_x_pos, sprite_x_size, TILE_NUMBER, TILE_NUMBER_OFFS, GFX_DATA);
                         // $display("%d %d %d", tiles_across, tiles_down, cur_row_lines_down);
                         GFX_CS<=1'b0;
                         st<=22;
