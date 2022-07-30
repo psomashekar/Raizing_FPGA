@@ -196,7 +196,7 @@ function mra {
         -start gp9001_0   0x110000  \
         -start text       0x510000  \
         -start oki1       0x518000  \
-        -setword maincpu  16 \
+        -setword maincpu  16 reverse \
         -setword gp9001_0 16 reverse \
         -frac 1 gp9001_0 2 \
         -order-roms gp9001_0 0 1 \

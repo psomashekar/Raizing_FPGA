@@ -18,7 +18,9 @@
         <!-- mapper for game 00 - bgaregga, 01 - sstriker, 02 - kingdmgp -->
         <part>01</part>
         <!-- maincpu - starts at 0x0 -->
-        <part name="ra-ma-01_01.u65" crc="92259f84"/>
+        <interleave output="16">
+        <part name="ra-ma-01_01.u65" crc="92259f84" map="12"/>
+        </interleave>
         <!-- audiocpu - starts at 0x80000 -->
         <part name="ra-ma-01_02.u66" crc="eabfa46d"/>
         <!-- gp9001_0 - starts at 0x90000 -->
