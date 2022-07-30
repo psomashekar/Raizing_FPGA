@@ -214,7 +214,7 @@ always @(posedge CLK96, posedge RESET96) begin
         last_HB    <= HB;
         c<=c+1;
 
-        if( (pedg_HB && !VB)  || VRENDER == 0 ) begin
+        if( (pedg_HB && !VB)  || (VRENDER == 0 && pedg_HB) ) begin
             start <= 1'b1;
         end
 
