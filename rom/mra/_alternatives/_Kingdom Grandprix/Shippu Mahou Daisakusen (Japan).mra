@@ -1,36 +1,39 @@
 <misterromdescription>
     <about author="pram0d" webpage="https://pram0d.com" source="https://github.com/psomashekar" twitter="@pr4m0d"/>
-    <name>Sorcer Striker</name>
-    <setname>sstriker</setname>
+    <name>Shippu Mahou Daisakusen (Japan)</name>
+    <setname>shippumd</setname>
     <rbf>garegga</rbf>
     <mameversion>0245</mameversion>
-    <year>1993</year>
-    <manufacturer>Raizing</manufacturer>
+    <year>1994</year>
+    <manufacturer>Raizing / Eighting</manufacturer>
     <players>2</players>
     <joystick>8-way</joystick>
     <rotation>vertical</rotation>
-    <region>World</region>
+    <region>Japan</region>
     <platform>Toaplan 2</platform>
     <category>Shoot'em up</category>
     <catver>Shooter / Flying Vertical</catver>
     <mraauthor>pram0d, atrac17</mraauthor>
-    <rom index="0" zip="sstriker.zip" md5="None" address="0x30000000">
+    <rom index="0" zip="shippumd.zip|kingdmgp.zip" md5="None" address="0x30000000">
         <!-- mapper for game 00 - bgaregga, 01 - sstriker, 02 - kingdmgp -->
-        <part>01</part>
+        <part>02</part>
         <!-- maincpu - starts at 0x0 -->
-        <part name="ra-ma_01_01.u65" crc="708fd51d"/>
-        <!-- audiocpu - starts at 0x80000 -->
-        <part name="ra-ma-01_02.u66" crc="eabfa46d"/>
-        <!-- gp9001_0 - starts at 0x90000 -->
         <interleave output="16">
-            <part name="ra-ma01-rom2.u2" crc="54e2bd95" map="01"/>
-            <part name="ra-ma01-rom3.u1" crc="21cd378f" map="10"/>
+            <part name="ma02rom1.bin" crc="a678b149" map="01"/>
+            <part name="ma02rom0.bin" crc="f226a212" map="10"/>
         </interleave>
-        <!-- text - starts at 0x290000 -->
-        <part name="ra-ma-01_05.u81" crc="88b58841"/>
-        <!-- oki1 - starts at 0x298000 -->
-        <part name="ra-ma01-rom1.u57" crc="6edb2ab8"/>
-        <!-- Total 0x2D8000 bytes - 2912 kBytes -->
+        <!-- audiocpu - starts at 0x100000 -->
+        <part name="ma02rom2.bin" crc="dde8a57e"/>
+        <!-- gp9001_0 - starts at 0x110000 -->
+        <interleave output="16">
+            <part name="ma02rom3.bin" crc="0e797142" map="01"/>
+            <part name="ma02rom4.bin" crc="72a6fa53" map="10"/>
+        </interleave>
+        <!-- text - starts at 0x510000 -->
+        <part name="ma02rom5.bin" crc="116ae559"/>
+        <!-- oki1 - starts at 0x518000 -->
+        <part name="ma02rom6.bin" crc="199e7cae"/>
+        <!-- Total 0x598000 bytes - 5728 kBytes -->
     </rom>
     <!-- Vertical game -->
     <rom index="1">

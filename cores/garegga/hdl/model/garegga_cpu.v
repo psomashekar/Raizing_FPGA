@@ -334,7 +334,7 @@ always @(posedge CLK96, posedge RESET96) begin
 
                    read_port_in1_r_cs ? {2{p1_ctrl}} : //controller inputs
                    read_port_in2_r_cs ? {2{p2_ctrl}} :
-                   read_port_sys_r_cs ? {2{1'b0, 1'b0, ~COIN_INPUT[1], ~COIN_INPUT[0], ~START_BUTTON[1], ~START_BUTTON[0], 1'b0 ,1'b0, ~SERVICE}} :
+                   read_port_sys_r_cs ? {2{DIPSW_C, 1'b0, ~START_BUTTON[1], ~START_BUTTON[0], ~COIN_INPUT[1], ~COIN_INPUT[0], ~DIP_TEST, 1'b0, ~SERVICE}} :
                    read_port_dswa_r_cs ? {2{DIPSW_A}} :
                    read_port_dswb_r_cs ? {2{DIPSW_B}} :
                    read_port_jmpr_r_cs ? {2{DIPSW_C}} :

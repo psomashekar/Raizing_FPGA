@@ -1,31 +1,55 @@
 [all]
+
 CORENAME=BAKRAID
 GAMETOP=bakraid_game
-JTFRAME_CLK96
-JTFRAME_CLK48
-JTFRAME_SDRAM96
-JTFRAME_VERTICAL
-COLORW=8
-JTFRAME_HEIGHT=240
-JTFRAME_SDRAM_BANKS
-JTFRAME_BA0_LEN=64
-JTFRAME_BA1_LEN=64
-JTFRAME_BA2_LEN=64
-JTFRAME_BA3_LEN=64
-JTFRAME_BUTTONS=6
-STEREO_GAME
-JTFRAME_IOCTL_RD=512
-JTFRAME_OSD_NOLOAD
-JTFRAME_OSD_NOCREDITS
-JTFRAME_OSD_NOLOGO
-JTFRAME_ROTATE
-JTFRAME_ARX=4
-JTFRAME_ARY=3
-JTFRAME_WIDTH=320
-JTFRAME_ADPCM
-JTFRAME_OSD_VOL
-JTFRAME_OSD_SND_EN
-JTFRAME_MRA_DIP
-JTFRAME_MR_DDRLOAD
-JTFRAME_MR_ROTCCW
+
+### Clock Inputs
+
+JTFRAME_CLK48            #Adds an additional clock input
+JTFRAME_CLK96            #Adds an additional clock input
+
+### SDRAM parameters
+
+JTFRAME_SDRAM96          #SDRAM is clocked at 96MHz and the clk input of game is 96MHz
+JTFRAME_SDRAM_BANKS      #Game module ports will support interleaved bank access
+JTFRAME_BA0_LEN=64       #Sets length of bank x, valid values 16, 32 or 64
+JTFRAME_BA1_LEN=64       #Sets length of bank x, valid values 16, 32 or 64
+JTFRAME_BA2_LEN=64       #Sets length of bank x, valid values 16, 32 or 64
+JTFRAME_BA3_LEN=64       #Sets length of bank x, valid values 16, 32 or 64
+
+### NVRAM parameters
+
+JTFRAME_IOCTL_RD=512     #Enables saving to SD card via NVRAM interface
+
+### Screen parameters
+
+JTFRAME_COLORW=8         #Sets the number of bits per color component (default=4)
+
+JTFRAME_WIDTH=320        #Sets the video width
+JTFRAME_HEIGHT=240       #Sets the video height
+
+JTFRAME_VERTICAL         #Enables support for vertical games
+JTFRAME_ROTATE           #Enables more rotate options in the OSD
+JTFRAME_MR_ROTCCW        #Rotate the frame counter clockwise
+
+JTFRAME_ARX=4            #Defines aspect ratio
+JTFRAME_ARY=3            #Defines aspect ratio
+
+### Audio section
+
+JTFRAME_ADPCM           #Moved to JTFRAME_OSD_SND_EN commit 052f6ba
+JTFRAME_OSD_VOL         #Show FX volume control on OSD
+JTFRAME_OSD_SND_EN      #OSD option to enable/disable FX and FM channels
+STEREO_GAME              #Define stereo audio (JTFRAME NOT UPDATED WITH JTFRAME_STEREO)
+
+### PCB Configuration
+
+JTFRAME_BUTTONS=3        #Sets the number of action buttons used (2 by default)
+JTFRAME_MR_DDRLOAD       #ROM download process uses the DDR as proxy
+
+### OSD Options
+
+JTFRAME_OSD_NOLOAD       #No load option on OSD (on by default on MiST)
+JTFRAME_OSD_NOCREDITS    #No credits option on OSD
+JTFRAME_OSD_NOLOGO       #Disables the JT logo as OSD background
 
