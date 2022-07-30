@@ -97,7 +97,7 @@ module garegga_video (
 );
 
 wire ACTIVE;
-wire [8:0] H, V;
+wire [8:0] H;
 wire [8:0] VRENDER;
 
 wire HB = ~LHBL, VB = ~LVBL;
