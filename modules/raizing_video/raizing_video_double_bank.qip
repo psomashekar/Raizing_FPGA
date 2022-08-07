@@ -5,4 +5,5 @@ set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) raizing
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) raizing_scroll.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) double_bank/raizing_gcu.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) raizing_pal.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) hvsync_generator.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) double_bank/AFBK_CT2.v]
