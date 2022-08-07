@@ -101,7 +101,15 @@ always @(posedge CLK) begin
     peak <= peak_l | peak_r;
 end
 
-wire [7:0] gain1 = pcmgain + (FX_LEVEL<<1);
+reg [7:0] gain1;
+reg signed [15:0] final_left;
+reg signed [13:0] final_oki0;
+always @(posedge CLK96) begin
+    final_left<=fm_left;
+    final_oki0<=oki0_pre;
+    gain1<=pcmgain + (FX_LEVEL<<1);
+end
+
 assign right = left;
 assign peak_r = peak_l;
 jtframe_mixer #(.W0(16), .W1(14), .WOUT(16)) u_mix_left(
@@ -109,8 +117,8 @@ jtframe_mixer #(.W0(16), .W1(14), .WOUT(16)) u_mix_left(
     .clk    ( CLK96       ),
     .cen    ( 1'b1      ),
     // input signals
-    .ch0    ( fm_left   ),
-    .ch1    ( oki0_pre ),
+    .ch0    ( final_left   ),
+    .ch1    ( final_oki0 ),
     .ch2    ( 16'd0 ),
     .ch3    ( 16'd0     ),
     // gain for each channel in 4.4 fixed point format
