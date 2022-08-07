@@ -204,12 +204,12 @@ jtframe_rom_5slots #(
 
 	.SLOT0_AW    (20), //68k rom (16 bit addressing)
 	.SLOT0_DW    (16),
-	.SLOT0_LATCH (0),
+	.SLOT0_LATCH (1),
 	.SLOT0_DOUBLE(1),
 
 	.SLOT1_AW    (18), //z80 rom (8 bit addressing)
 	.SLOT1_DW    (8),
-	.SLOT1_LATCH (0),
+	.SLOT1_LATCH (1),
 	.SLOT1_DOUBLE(1),
 
 
@@ -220,7 +220,7 @@ jtframe_rom_5slots #(
 
 	.SLOT3_AW    (18), //z80 rom mirror (8 bit addressing)
 	.SLOT3_DW    (8),
-	.SLOT3_LATCH (0),
+	.SLOT3_LATCH (1),
 	.SLOT3_DOUBLE(1),
 
 	.SLOT4_AW    (21), //PCM rom mirror (8 bit addressing)
