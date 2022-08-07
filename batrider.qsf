@@ -84,7 +84,7 @@ set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM96=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_BANKS=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_REPACK=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_NOHOLDBUS=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_AUTOPRECH=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_AUTOPRECH=1"
 #set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_AUTOPRECH=1"
 #set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_AUTOPRECH=1"
 #set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_AUTOPRECH=1"
@@ -149,8 +149,4 @@ set_instance_assignment -name SLEW_RATE 0 -to SDRAM_CKE
 
 set_global_assignment -name FAMILY "Cyclone V"
 
-set_global_assignment -name ENABLE_SIGNALTAP OFF
-set_global_assignment -name USE_SIGNALTAP_FILE stp1.stp
-set_global_assignment -name SIGNALTAP_FILE obj_troubleshooting.stp
-set_global_assignment -name SIGNALTAP_FILE stp1.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

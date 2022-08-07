@@ -230,23 +230,23 @@ jtframe_rom_4slots #(
 
 	.SLOT0_AW    (20), //68k rom (16 bit addressing)
 	.SLOT0_DW    (16),
-	.SLOT0_LATCH (0),
+	.SLOT0_LATCH (1),
 	.SLOT0_DOUBLE(1),
 
 	.SLOT1_AW    (17), //z80 rom (8 bit addressing)
 	.SLOT1_DW    (8),
-	.SLOT1_LATCH (0),
+	.SLOT1_LATCH (1),
 	.SLOT1_DOUBLE(0),
 
 
 	.SLOT2_AW    (22), //PCM rom 6 (8 bit addressing)
 	.SLOT2_DW    (8),
-	.SLOT2_LATCH (1),
+	.SLOT2_LATCH (0),
 	.SLOT2_DOUBLE(1),
 
 	.SLOT3_AW    (17), //z80 rom mirror (8 bit addressing)
 	.SLOT3_DW    (8),
-	.SLOT3_LATCH (0),
+	.SLOT3_LATCH (1),
 	.SLOT3_DOUBLE(0),
 
 	.SLOT0_OFFSET(0),
@@ -396,12 +396,12 @@ jtframe_rom_2slots #(
 	.SDRAMW		 (22),
 	.SLOT0_AW	 (22),
 	.SLOT0_DW	 (8),
-	.SLOT0_LATCH (1),
+	.SLOT0_LATCH (0),
 	.SLOT0_DOUBLE(1),
 
 	.SLOT1_AW	 (22),
 	.SLOT1_DW	 (8),
-	.SLOT1_LATCH (1),
+	.SLOT1_LATCH (0),
 	.SLOT1_DOUBLE(1),
 
 	.SLOT0_OFFSET(0),
