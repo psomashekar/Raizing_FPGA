@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-module garegga_gcu (
+module raizing_gcu (
     input              CLK,
     input              CLK96,
     input              GFX_CLK,
@@ -43,6 +43,8 @@ module garegga_gcu (
     input         GP9001_OP_READ_RAM_H,
     input         GP9001_OP_READ_RAM_L,
     input         GP9001_OP_SET_RAM_PTR,
+    input         GP9001_OP_OBJECTBANK_WR,
+    input [2:0]   GP9001_OBJECTBANK_SLOT,
     output        HSYNC,
     output        VSYNC,
     output        FBLANK,
@@ -107,27 +109,33 @@ module garegga_gcu (
     input [15:0] SCR2_TILE_NUMBER_OFFS,
 
     //GFX Read
-    output   GFX_CS,
-    input    GFX_OK,
+    output  [1:0] GFX_CS,
+    input   [1:0] GFX_OK,
     output [21:0] GFX0_ADDR,
     input  [31:0] GFX0_DOUT,
+    output [21:0] GFX1_ADDR,
+    input  [31:0] GFX1_DOUT,
 
-    output   GFXSCR0_CS,
-    input    GFXSCR0_OK,
+    output  [1:0] GFXSCR0_CS,
+    input   [1:0] GFXSCR0_OK,
     output [21:0] GFX0SCR0_ADDR,
     input  [31:0] GFX0SCR0_DOUT,
+    output [21:0] GFX1SCR0_ADDR,
+    input  [31:0] GFX1SCR0_DOUT,
 
-    output   GFXSCR1_CS,
-    input    GFXSCR1_OK,
+    output  [1:0] GFXSCR1_CS,
+    input   [1:0] GFXSCR1_OK,
     output [21:0] GFX0SCR1_ADDR,
     input  [31:0] GFX0SCR1_DOUT,
+    output [21:0] GFX1SCR1_ADDR,
+    input  [31:0] GFX1SCR1_DOUT,
 
-    output   GFXSCR2_CS,
-    input    GFXSCR2_OK,
+    output  [1:0] GFXSCR2_CS,
+    input   [1:0] GFXSCR2_OK,
     output [21:0] GFX0SCR2_ADDR,
     input  [31:0] GFX0SCR2_DOUT,
-
-    input [7:0] GAME,
+    output [21:0] GFX1SCR2_ADDR,
+    input  [31:0] GFX1SCR2_DOUT,
 
     input   [8:0] HS_START,
     input   [8:0] HS_END,
@@ -135,21 +143,19 @@ module garegga_gcu (
     input   [8:0] VS_END
 );
 
-localparam GAREGGA = 'h0, KINGDMGP = 'h2, SSTRIKER = 'h1;
-
 //debugging 
 //  wire debug = 1'b1;
 //  integer fd;
 //  initial fd = $fopen("log_gp9001.txt", "w");
 
 // layer offsets
-wire signed [12:0] background_scroll_xoffs = GAME == SSTRIKER ? -12'h1D5 : -12'h1D6;
+wire signed [12:0] background_scroll_xoffs = -12'h1D6;
 wire signed [12:0] background_scroll_xoffs_f = -12'h229;
-wire signed [12:0] foreground_scroll_xoffs = GAME == SSTRIKER ? -12'h1D7 : -12'h1D8;
+wire signed [12:0] foreground_scroll_xoffs = -12'h1D8;
 wire signed [12:0] foreground_scroll_xoffs_f = -12'h227;
-wire signed [12:0] text_scroll_xoffs = GAME == SSTRIKER ? -12'h1D9 : -12'h1DA;
+wire signed [12:0] text_scroll_xoffs = -12'h1DA;
 wire signed [12:0] text_scroll_xoffs_f = -12'h225;
-wire signed [12:0] sprite_scroll_xoffs = 12'h024; //12'h1CC;
+wire        [12:0] sprite_scroll_xoffs = 12'h024; //12'h1CC;
 wire signed [12:0] sprite_scroll_xoffs_f = -12'h17B;
 
 wire signed [12:0] background_scroll_yoffs = -12'h1EF;
@@ -158,8 +164,7 @@ wire signed [12:0] foreground_scroll_yoffs = -12'h1EF;
 wire signed [12:0] foreground_scroll_yoffs_f = -12'h210;
 wire signed [12:0] text_scroll_yoffs = -12'h1EF;
 wire signed [12:0] text_scroll_yoffs_f = -12'h210;
-wire signed [12:0] sprite_scroll_yoffs = GAME == KINGDMGP || GAME == SSTRIKER ? -12'h001 :
-                                         12'h001; //-12'h1EF;
+wire        [12:0] sprite_scroll_yoffs = 12'h001; //-12'h1EF;
 wire signed [12:0] sprite_scroll_yoffs_f = -12'h108;
 
 //blanking signal generation
@@ -263,7 +268,7 @@ always @(posedge CLK96, posedge RESET96) begin
         //     $fwrite(fd, "time: %t, din: %h, dout: %h, cur_ram_ptr: %h, op: %h\n", $time/1000, DIN, DOUT, cur_ram_ptr, {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR});
 
         //reset vars in transition
-        if(LAST_OP != {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L}) begin
+        if(LAST_OP != {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR}) begin
             st<=0;
             INC_LAST_CYCLE <= 1'b0;
             GP9001RAM_WE<=1'b0;
@@ -273,7 +278,7 @@ always @(posedge CLK96, posedge RESET96) begin
         if(GP9001_OP_SELECT_REG) begin
             cur_scr_reg_num <= DIN & 8'h8F;
             ACK <= 1'b1;
-            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L};
+            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR};
         end else if(GP9001_OP_WRITE_REG) begin
             case(cur_scr_reg_num)
                 8'h00, 8'h80: begin
@@ -329,11 +334,11 @@ always @(posedge CLK96, posedge RESET96) begin
                 end
             endcase
             ACK <= 1'b1;
-            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L};
+            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR};
         end else if (GP9001_OP_SET_RAM_PTR) begin
             cur_ram_ptr <= DIN;
             ACK <= 1'b1;
-            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L};
+            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR};
         end else if (GP9001_OP_WRITE_RAM) begin
             if(!INC_LAST_CYCLE) begin
                 GP9001RAM_ADDR <= (cur_ram_ptr & 16'h1FFF);
@@ -349,7 +354,7 @@ always @(posedge CLK96, posedge RESET96) begin
                 ACK<=1'b1;
             end
             
-            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L};
+            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR};
         end else if(GP9001_OP_READ_RAM_H || GP9001_OP_READ_RAM_L) begin
             case(st)
                 0: begin
@@ -366,7 +371,10 @@ always @(posedge CLK96, posedge RESET96) begin
                 end
             endcase
             
-            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L};
+            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR};
+        end else if(GP9001_OP_OBJECTBANK_WR) begin
+            ACK <= 1'b1;
+            LAST_OP <= {GP9001_OP_SELECT_REG, GP9001_OP_WRITE_REG, GP9001_OP_SET_RAM_PTR, GP9001_OP_WRITE_RAM, GP9001_OP_READ_RAM_H, GP9001_OP_READ_RAM_L, GP9001_OP_OBJECTBANK_WR};
         end else begin
             ACK <= 1'b1;
             GP9001RAM_WE <= 1'b0;
@@ -481,6 +489,10 @@ AFBK_CT2 u_afbk_ct2(
     .GFX_CLK(GFX_CLK),
     .RESET(RESET),
     .RESET96(RESET96),
+    //object bank
+    .OBJECTBANK_SLOT(GP9001_OBJECTBANK_SLOT),
+    .OBJECTBANK_DIN(DIN & 4'hF),
+    .OBJECTBANK_WR(GP9001_OP_OBJECTBANK_WR),
 
     //tile requests
     .TILE_NUMBER(TILE_NUMBER),
@@ -517,21 +529,29 @@ AFBK_CT2 u_afbk_ct2(
 	.GFX_OK(GFX_OK),
     .GFX0_ADDR(GFX0_ADDR),
 	.GFX0_DOUT(GFX0_DOUT),
+    .GFX1_ADDR(GFX1_ADDR),
+	.GFX1_DOUT(GFX1_DOUT),
 
     .GFXSCR0_CS(GFXSCR0_CS),
 	.GFXSCR0_OK(GFXSCR0_OK),
     .GFX0SCR0_ADDR(GFX0SCR0_ADDR),
 	.GFX0SCR0_DOUT(GFX0SCR0_DOUT),
+    .GFX1SCR0_ADDR(GFX1SCR0_ADDR),
+	.GFX1SCR0_DOUT(GFX1SCR0_DOUT),
 
     .GFXSCR1_CS(GFXSCR1_CS),
 	.GFXSCR1_OK(GFXSCR1_OK),
     .GFX0SCR1_ADDR(GFX0SCR1_ADDR),
 	.GFX0SCR1_DOUT(GFX0SCR1_DOUT),
+    .GFX1SCR1_ADDR(GFX1SCR1_ADDR),
+	.GFX1SCR1_DOUT(GFX1SCR1_DOUT),
 
     .GFXSCR2_CS(GFXSCR2_CS),
 	.GFXSCR2_OK(GFXSCR2_OK),
     .GFX0SCR2_ADDR(GFX0SCR2_ADDR),
-	.GFX0SCR2_DOUT(GFX0SCR2_DOUT)
+	.GFX0SCR2_DOUT(GFX0SCR2_DOUT),
+    .GFX1SCR2_ADDR(GFX1SCR2_ADDR),
+	.GFX1SCR2_DOUT(GFX1SCR2_DOUT)
 );
 
 endmodule

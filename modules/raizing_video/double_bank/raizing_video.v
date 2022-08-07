@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-module garegga_video (
+module raizing_video (
     input         CLK,
     input         CLK96,
     input         PIXEL_CEN,
@@ -39,25 +39,33 @@ module garegga_video (
     input  [15:0] TEXTSCROLL_DATA,
 
     //graphics ROM
-    output   GFX_CS,
-    input    GFX_OK,
+    output  [1:0] GFX_CS,
+    input   [1:0] GFX_OK,
     output [21:0] GFX0_ADDR,     
     input  [31:0] GFX0_DOUT,
+    output [21:0] GFX1_ADDR,     
+    input  [31:0] GFX1_DOUT,
 
-    output   GFXSCR0_CS,
-    input    GFXSCR0_OK,
+    output  [1:0] GFXSCR0_CS,
+    input   [1:0] GFXSCR0_OK,
     output [21:0] GFX0SCR0_ADDR,     
     input  [31:0] GFX0SCR0_DOUT,
+    output [21:0] GFX1SCR0_ADDR,     
+    input  [31:0] GFX1SCR0_DOUT,
 
-    output   GFXSCR1_CS,
-    input    GFXSCR1_OK,
+    output  [1:0] GFXSCR1_CS,
+    input   [1:0] GFXSCR1_OK,
     output [21:0] GFX0SCR1_ADDR,     
     input  [31:0] GFX0SCR1_DOUT,
+    output [21:0] GFX1SCR1_ADDR,     
+    input  [31:0] GFX1SCR1_DOUT,
 
-    output   GFXSCR2_CS,
-    input    GFXSCR2_OK,
+    output  [1:0] GFXSCR2_CS,
+    input   [1:0] GFXSCR2_OK,
     output [21:0] GFX0SCR2_ADDR,     
     input  [31:0] GFX0SCR2_DOUT,
+    output [21:0] GFX1SCR2_ADDR,     
+    input  [31:0] GFX1SCR2_DOUT,
 
     //gp9001
     input         GP9001CS,
@@ -71,6 +79,8 @@ module garegga_video (
     input         GP9001_OP_READ_RAM_H, 
     input         GP9001_OP_READ_RAM_L, 
     input         GP9001_OP_SET_RAM_PTR, 
+    input         GP9001_OP_OBJECTBANK_WR,
+    input   [2:0] GP9001_OBJECTBANK_SLOT,
     output [10:0] GP9001OUT,
 
     //video signal
@@ -87,8 +97,6 @@ module garegga_video (
     output  [7:0] RED,
     output  [7:0] GREEN,
     output  [7:0] BLUE,
-
-    input   [7:0] GAME,
 
     input   [8:0] HS_START,
     input   [8:0] HS_END,
@@ -127,7 +135,7 @@ hvsync_generator u_hvsync(
     .vrender(VRENDER)
 );
 
-garegga_pal u_pal (
+raizing_pal u_pal (
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -145,7 +153,8 @@ garegga_pal u_pal (
     .BLUE(BLUE),
     .ACTIVE(ACTIVE)
 );
-garegga_colmix u_colmix(
+
+raizing_colmix u_colmix(
     .CLK(CLK),
     .CLK96(CLK96),
     .RESET(RESET),
@@ -160,7 +169,7 @@ garegga_colmix u_colmix(
     .ACTIVE(ACTIVE)
 );
 
-garegga_extratext u_extratext(
+raizing_extratext u_extratext(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -188,9 +197,7 @@ garegga_extratext u_extratext(
     .TEXTSCROLL_ADDR(TEXTSCROLL_ADDR),
     .TEXTSCROLL_DATA(TEXTSCROLL_DATA),
 
-    .EXTRATEXT_PIXEL(EXTRATEXT_PIXEL),
-
-    .GAME(GAME)
+    .EXTRATEXT_PIXEL(EXTRATEXT_PIXEL)
 );
 
 wire  [12:0] GP9001RAM_GCU_ADDR;
@@ -250,7 +257,7 @@ wire signed [12:0] TEXT_SCROLL_Y;
 wire signed [12:0] TEXT_SCROLL_XOFFS;
 wire signed [12:0] TEXT_SCROLL_YOFFS;
 
-garegga_obj u_obj(
+raizing_obj u_obj(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -285,7 +292,7 @@ garegga_obj u_obj(
     .OBJ_PIXEL(OBJ_PIXEL)
 );
 
-garegga_scroll u_scroll(
+raizing_scroll u_scroll(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -344,7 +351,7 @@ garegga_scroll u_scroll(
     .SCROLL2_PIXEL(SCROLL2_PIXEL)
 );
 
-garegga_gcu u_gcu(
+raizing_gcu u_gcu(
     .RESET(RESET),
     .RESET96(RESET96),
     .CLK(CLK),
@@ -359,6 +366,8 @@ garegga_gcu u_gcu(
     .GP9001_OP_READ_RAM_H(GP9001_OP_READ_RAM_H),
     .GP9001_OP_READ_RAM_L(GP9001_OP_READ_RAM_L),
     .GP9001_OP_SET_RAM_PTR(GP9001_OP_SET_RAM_PTR),
+    .GP9001_OP_OBJECTBANK_WR(GP9001_OP_OBJECTBANK_WR),
+    .GP9001_OBJECTBANK_SLOT(GP9001_OBJECTBANK_SLOT),
     .DIN(GP9001DIN),
     .DOUT(GP9001DOUT),
     .V(V),
@@ -433,23 +442,29 @@ garegga_gcu u_gcu(
     .GFX_OK(GFX_OK),
     .GFX0_ADDR(GFX0_ADDR),     
     .GFX0_DOUT(GFX0_DOUT),
+    .GFX1_ADDR(GFX1_ADDR),     
+    .GFX1_DOUT(GFX1_DOUT),
 
     .GFXSCR0_CS(GFXSCR0_CS),
     .GFXSCR0_OK(GFXSCR0_OK),
     .GFX0SCR0_ADDR(GFX0SCR0_ADDR),     
     .GFX0SCR0_DOUT(GFX0SCR0_DOUT),
+    .GFX1SCR0_ADDR(GFX1SCR0_ADDR),     
+    .GFX1SCR0_DOUT(GFX1SCR0_DOUT),
 
     .GFXSCR1_CS(GFXSCR1_CS),
     .GFXSCR1_OK(GFXSCR1_OK),
     .GFX0SCR1_ADDR(GFX0SCR1_ADDR),     
     .GFX0SCR1_DOUT(GFX0SCR1_DOUT),
+    .GFX1SCR1_ADDR(GFX1SCR1_ADDR),     
+    .GFX1SCR1_DOUT(GFX1SCR1_DOUT),
 
     .GFXSCR2_CS(GFXSCR2_CS),
     .GFXSCR2_OK(GFXSCR2_OK),
     .GFX0SCR2_ADDR(GFX0SCR2_ADDR),     
     .GFX0SCR2_DOUT(GFX0SCR2_DOUT),
-
-    .GAME(GAME),
+    .GFX1SCR2_ADDR(GFX1SCR2_ADDR),     
+    .GFX1SCR2_DOUT(GFX1SCR2_DOUT),
 
     .HS_START(HS_START),
     .HS_END(HS_END),
