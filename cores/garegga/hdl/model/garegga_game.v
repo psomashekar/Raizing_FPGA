@@ -306,7 +306,7 @@ garegga_cpu u_cpu (
     .GAME(GAME)
 );
 
-garegga_video u_video(
+raizing_video u_video(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(pxl_cen),
