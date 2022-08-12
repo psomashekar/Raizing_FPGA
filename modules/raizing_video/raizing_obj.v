@@ -46,10 +46,10 @@ module raizing_obj (
     input  [31:0] GFX_DATA,
 
     //sprite scroll regs
-    input signed [12:0] SPRITE_SCROLL_X,
-    input signed [12:0] SPRITE_SCROLL_Y,
-    input        [12:0] SPRITE_SCROLL_XOFFS,
-    input        [12:0] SPRITE_SCROLL_YOFFS,
+    input signed [9:0] SPRITE_SCROLL_X,
+    input signed [9:0] SPRITE_SCROLL_Y,
+    input signed [9:0] SPRITE_SCROLL_XOFFS,
+    input signed [9:0] SPRITE_SCROLL_YOFFS,
 
     output reg [14:0] OBJ_PIXEL
 );
@@ -317,14 +317,17 @@ always @(posedge CLK96, posedge RESET96) begin
                         xfl= GP9001RAM_GCU_DOUT[12]; //is x-flipped
                         priority_l= GP9001RAM_GCU_DOUT[11:8]; //get the sprite priority
 
-                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0];
+                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0] + 1;
                         sprite_y_pos_t = !mc ? 
                                             (GP9001RAM2_GCU_DOUT[15:7] + SPRITE_SCROLL_Y + SPRITE_SCROLL_YOFFS) & 'h1FF :
                                             (multiconnector_y + GP9001RAM2_GCU_DOUT[15:7]) & 'h1FF;
                         
-                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t + 1) << 3);
-                        
-                        if(sprite_y_pos_t > 384) sprite_y_pos_t = sprite_y_pos_t - 'h200;
+                        if(yfl) begin
+                            sprite_y_pos_t=sprite_y_pos_t-(sprite_y_size_t<<3);
+                            if(sprite_y_pos_t >= 448) sprite_y_pos_t = sprite_y_pos_t - 'h200;
+                        end else begin
+                            if(sprite_y_pos_t >= 384) sprite_y_pos_t = sprite_y_pos_t - 'h200;
+                        end
                         
                         if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + ((sprite_y_size_t + 1) << 3))) begin 
                             sprite_y_size_t = sprite_y_size_t - (-sprite_y_pos_t>>3);
@@ -459,7 +462,7 @@ always @(posedge CLK96, posedge RESET96) begin
                     sprite_y_size_t=sprite_y_size;
 
                     if(xflip) begin
-                        if($signed(sprite_x_pos-7) > (320 + 128)) begin
+                        if($signed(sprite_x_pos-7) >= 448) begin
                             sprite_x_pos <= $signed(sprite_x_pos - 'h200 - 'd7);
                         end
                         else begin
@@ -467,7 +470,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         end
                     end else begin
 
-                        if($signed(sprite_x_pos) > (512 - 128)) begin
+                        if($signed(sprite_x_pos) >= 384) begin
                             sprite_x_pos <= $signed(sprite_x_pos - 'h200);
                         end
                     end
