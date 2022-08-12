@@ -46,10 +46,10 @@ module raizing_obj (
     input  [31:0] GFX_DATA,
 
     //sprite scroll regs
-    input signed [9:0] SPRITE_SCROLL_X,
-    input signed [9:0] SPRITE_SCROLL_Y,
-    input signed [9:0] SPRITE_SCROLL_XOFFS,
-    input signed [9:0] SPRITE_SCROLL_YOFFS,
+    input signed [12:0] SPRITE_SCROLL_X,
+    input signed [12:0] SPRITE_SCROLL_Y,
+    input signed [12:0] SPRITE_SCROLL_XOFFS,
+    input signed [12:0] SPRITE_SCROLL_YOFFS,
 
     output reg [14:0] OBJ_PIXEL
 );
