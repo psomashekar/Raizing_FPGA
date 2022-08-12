@@ -322,20 +322,16 @@ always @(posedge CLK96, posedge RESET96) begin
                                             (GP9001RAM2_GCU_DOUT[15:7] + SPRITE_SCROLL_Y + SPRITE_SCROLL_YOFFS) & 'h1FF :
                                             (multiconnector_y + GP9001RAM2_GCU_DOUT[15:7]) & 'h1FF;
                         
-                        if(yfl) begin
-                            sprite_y_pos_t=sprite_y_pos_t-(sprite_y_size_t<<3);
-                            if(sprite_y_pos_t >= 448) sprite_y_pos_t = sprite_y_pos_t - 'h200;
-                        end else begin
-                            if(sprite_y_pos_t >= 384) sprite_y_pos_t = sprite_y_pos_t - 'h200;
-                        end
+                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t) << 3);
                         
-                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + ((sprite_y_size_t + 1) << 3))) begin 
+                        if(sprite_y_pos_t >= 384 || (sprite_y_pos_t >=448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
+                        
+                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + (sprite_y_size_t << 3))) begin 
                             sprite_y_size_t = sprite_y_size_t - (-sprite_y_pos_t>>3);
                             sprite_y_pos_t = 0;
                         end
 
-                        
-                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + ((sprite_y_size_t + 1) << 3))) begin
+                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + (sprite_y_size_t << 3))) begin
                             $display("queue: %d, %d, %d, %h, %h, %h", VRENDER, sprite_y_size_t, sprite_y_pos_t, sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8]+1, priority_l, spr[7:0]);
                             wr_spr_q <= spr[7:0];
                             wr_spr_q_addr<=((priority_l<<11) | sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]);
