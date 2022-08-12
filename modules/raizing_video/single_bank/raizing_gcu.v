@@ -159,7 +159,7 @@ wire signed [12:0] foreground_scroll_yoffs_f = -12'h210;
 wire signed [12:0] text_scroll_yoffs = -12'h1EF;
 wire signed [12:0] text_scroll_yoffs_f = -12'h210;
 wire signed [12:0] sprite_scroll_yoffs = GAME == KINGDMGP || GAME == SSTRIKER ? -12'h001 :
-                                         -12'h001; //-12'h1EF;
+                                         12'h001; //-12'h1EF;
 wire signed [12:0] sprite_scroll_yoffs_f = -12'h108;
 
 //blanking signal generation
