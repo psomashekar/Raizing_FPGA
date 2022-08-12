@@ -420,7 +420,8 @@ garegga_sound u_sound(
     .SRAM_WE(SRAM_WE),
     .OKI_BANK(OKI_BANK),
     .GAME(GAME),
-    .FX_LEVEL(dip_fxlevel)
+    .FX_LEVEL(dip_fxlevel),
+    .DIP_PAUSE(DIP_PAUSE)
 );
 
 //sdram

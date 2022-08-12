@@ -56,7 +56,8 @@ module bakraid_sound (
     output reg     [7:0] SOUNDLATCH4,
     input          [7:0] SOUNDLATCH,
     input          [7:0] SOUNDLATCH2,
-    input          [1:0] FX_LEVEL
+    input          [1:0] FX_LEVEL,
+    input		 DIP_PAUSE
 );
 
 // assign ACK = 1'b1;
@@ -308,7 +309,7 @@ always @(posedge CLK96) begin
 end
 
 YMZ280B u_ymz280b (
-    .clock(CLK96), //aligned to sdram
+    .clock(CLK96 & DIP_PAUSE), //aligned to sdram
     .reset(RESET96),
     .io_cpu_rd(ymzrd),
     .io_cpu_wr(ymzwr),

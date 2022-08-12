@@ -480,7 +480,8 @@ batrider_sound u_sound(
     .right(snd_right),
     .sample(sample),
     .peak(peak),
-    .FX_LEVEL(dip_fxlevel)
+    .FX_LEVEL(dip_fxlevel),
+    .DIP_PAUSE(DIP_PAUSE)
 );
 
 //sdram
