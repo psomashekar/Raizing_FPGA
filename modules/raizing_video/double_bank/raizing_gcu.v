@@ -50,10 +50,10 @@ module raizing_gcu (
     output        FBLANK,
 
     //registers
-    output signed [12:0] SPRITE_SCROLL_X,
-    output signed [12:0] SPRITE_SCROLL_Y,
-    output        [12:0] SPRITE_SCROLL_XOFFS,
-    output        [12:0] SPRITE_SCROLL_YOFFS,
+    output signed [9:0] SPRITE_SCROLL_X,
+    output signed [9:0] SPRITE_SCROLL_Y,
+    output signed [9:0] SPRITE_SCROLL_XOFFS,
+    output signed [9:0] SPRITE_SCROLL_YOFFS,
     output signed [12:0] BACKGROUND_SCROLL_X,
     output signed [12:0] BACKGROUND_SCROLL_Y,
     output signed [12:0] BACKGROUND_SCROLL_XOFFS,
@@ -155,8 +155,8 @@ wire signed [12:0] foreground_scroll_xoffs = -12'h1D8;
 wire signed [12:0] foreground_scroll_xoffs_f = -12'h227;
 wire signed [12:0] text_scroll_xoffs = -12'h1DA;
 wire signed [12:0] text_scroll_xoffs_f = -12'h225;
-wire        [12:0] sprite_scroll_xoffs = 12'h024; //12'h1CC;
-wire signed [12:0] sprite_scroll_xoffs_f = -12'h17B;
+wire signed [9:0] sprite_scroll_xoffs = 10'h024; //12'h1CC;
+wire signed [9:0] sprite_scroll_xoffs_f = -12'h17B;
 
 wire signed [12:0] background_scroll_yoffs = -12'h1EF;
 wire signed [12:0] background_scroll_yoffs_f = -12'h210;
@@ -164,8 +164,8 @@ wire signed [12:0] foreground_scroll_yoffs = -12'h1EF;
 wire signed [12:0] foreground_scroll_yoffs_f = -12'h210;
 wire signed [12:0] text_scroll_yoffs = -12'h1EF;
 wire signed [12:0] text_scroll_yoffs_f = -12'h210;
-wire        [12:0] sprite_scroll_yoffs = 12'h001; //-12'h1EF;
-wire signed [12:0] sprite_scroll_yoffs_f = -12'h108;
+wire signed [9:0] sprite_scroll_yoffs = 10'h001; //-12'h1EF;
+wire signed [9:0] sprite_scroll_yoffs_f = -12'h108;
 
 //blanking signal generation
 assign HSYNC = H > HS_START && H < HS_END ? 0 : 1;
