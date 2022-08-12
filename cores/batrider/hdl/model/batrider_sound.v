@@ -54,7 +54,8 @@ module batrider_sound (
     output reg     [7:0] SOUNDLATCH4,
     input          [7:0] SOUNDLATCH,
     input          [7:0] SOUNDLATCH2,
-    input          [1:0] FX_LEVEL
+    input          [1:0] FX_LEVEL,
+    input		 DIP_PAUSE
 );
 
 // assign ACK = 1'b1;
@@ -344,7 +345,7 @@ assign PCM1_CS = 1'b1;
 jt6295 #(.INTERPOL(1)) u_adpcm_0(
     .rst        ( RESET96       ),
     .clk        ( CLK96       ),
-    .cen        ( OKI_CEN   ),
+    .cen        ( OKI_CEN & DIP_PAUSE   ),
     .ss         ( 1'b1      ),
     // CPU interface
     .wrn        ( ~okim6295_device_0_wr ),  // active low
@@ -362,7 +363,7 @@ jt6295 #(.INTERPOL(1)) u_adpcm_0(
 jt6295 #(.INTERPOL(1)) u_adpcm_1(
     .rst        ( RESET96       ),
     .clk        ( CLK96       ),
-    .cen        ( OKI_CEN   ),
+    .cen        ( OKI_CEN & DIP_PAUSE   ),
     .ss         ( 1'b0      ),
     // CPU interface
     .wrn        ( ~okim6295_device_1_wr ),  // active low
@@ -380,8 +381,8 @@ jt6295 #(.INTERPOL(1)) u_adpcm_1(
 jt51 u_jt51(
     .rst        ( RESET96       ), // reset
     .clk        ( CLK96       ), // main clock
-    .cen        ( YM2151_CEN    ),
-    .cen_p1     ( YM2151_CEN2   ),
+    .cen        ( YM2151_CEN & DIP_PAUSE    ),
+    .cen_p1     ( YM2151_CEN2 & DIP_PAUSE   ),
     .cs_n       ( !fm_cs    ), // chip select
     .wr_n       ( wr_n      ), // write
     .a0         ( A[0]     ),
