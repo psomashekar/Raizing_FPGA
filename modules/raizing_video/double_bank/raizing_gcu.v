@@ -35,6 +35,7 @@ module raizing_gcu (
     output     [10:0]  GP9001OUT,
     input              FLIPX,
     input              FLIPY,
+    input              LVBL,
 
     //Register operations
     input         GP9001_OP_SELECT_REG,
@@ -407,32 +408,65 @@ wire scroll1ram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h800 && GP9001RAM_ADDR<
 wire scroll2ram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1000 && GP9001RAM_ADDR<14'h1800);
 wire spriteram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1800 && GP9001RAM_ADDR<14'h1C00);
 
-jtframe_dual_ram #(.dw(16), .aw(11)) u_spriteram(
+//sprite lag fix
+reg [1:0] cur_buf = 0;
+wire [1:0] cur_buf_rd = cur_buf == 0 ? 2 :
+                        cur_buf == 1 ? 3 :
+                        cur_buf == 2 ? 0 :
+                        cur_buf == 3 ? 1 :
+                        0; //2 frames lag behind
+wire [12:0] spriteram_buff_offs = cur_buf==0 ? 0 :
+                                  cur_buf==1 ? 14'h400 :
+                                  cur_buf==2 ? 14'h800 :
+                                  cur_buf==3 ? 14'h1000 :
+                                  0;
+wire [12:0] spriteram_buff_rd_offs = cur_buf_rd==0 ? 0 :
+                                     cur_buf_rd==1 ? 13'h400 :
+                                     cur_buf_rd==2 ? 13'h800 :
+                                     cur_buf_rd==3 ? 13'h1000 :
+                                     0;
+
+reg last_vb = 0;
+wire is_vb = LVBL; // start of vblank
+
+always @(posedge CLK96, posedge RESET96) begin
+    if(RESET96) begin
+        last_vb<=0;
+        cur_buf<=0;
+    end else begin
+        last_vb<=is_vb;
+        if(is_vb && !last_vb) begin //start of vblank, cut spriteram
+            cur_buf<=cur_buf+1;
+        end
+    end
+end
+
+jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram(
         .clk0(CLK96),
         .clk1(CLK96),
         // Port 0
         .data0(GP9001RAM_DIN),
-        .addr0(GP9001RAM_ADDR[10:0]),
+        .addr0(GP9001RAM_ADDR[9:0] + spriteram_buff_offs),
         .we0(spriteram_we),
         .q0(),
         // Port 1
         .data1(8'h0),
-        .addr1(GP9001RAM_GCU_ADDR),
+        .addr1(GP9001RAM_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
         .we1(1'b0),
         .q1(GP9001RAM_GCU_DOUT)
 );
 
-jtframe_dual_ram #(.dw(16), .aw(11)) u_spriteram2(
+jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram2(
         .clk0(CLK96),
         .clk1(CLK96),
         // Port 0
         .data0(GP9001RAM_DIN),
-        .addr0(GP9001RAM_ADDR[10:0]),
+        .addr0(GP9001RAM_ADDR[9:0] + spriteram_buff_offs),
         .we0(spriteram_we),
         .q0(),
         // Port 1
         .data1(8'h0),
-        .addr1(GP9001RAM2_GCU_ADDR),
+        .addr1(GP9001RAM2_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
         .we1(1'b0),
         .q1(GP9001RAM2_GCU_DOUT)
 );

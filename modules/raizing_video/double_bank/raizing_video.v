@@ -372,6 +372,7 @@ raizing_gcu u_gcu(
     .DOUT(GP9001DOUT),
     .V(V),
     .H(H),
+    .LVBL(VB),
     .HSYNC(CPU_HSYNC),
     .VSYNC(CPU_VSYNC),
     .FBLANK(CPU_FBLANK),

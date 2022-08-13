@@ -324,7 +324,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         
                         if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t) << 3);
                         
-                        if(sprite_y_pos_t >= 384 || (sprite_y_pos_t >=448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
+                        if(sprite_y_pos_t >= 384 || (sprite_y_pos_t >= 448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
                         
                         if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + (sprite_y_size_t << 3))) begin 
                             sprite_y_size_t = sprite_y_size_t - (-sprite_y_pos_t>>3);
