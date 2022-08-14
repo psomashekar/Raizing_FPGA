@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-module batrider_obj (
+module raizing_obj (
     input CLK,
     input CLK96,
     input PIXEL_CEN,
@@ -48,8 +48,8 @@ module batrider_obj (
     //sprite scroll regs
     input signed [12:0] SPRITE_SCROLL_X,
     input signed [12:0] SPRITE_SCROLL_Y,
-    input        [12:0] SPRITE_SCROLL_XOFFS,
-    input        [12:0] SPRITE_SCROLL_YOFFS,
+    input signed [12:0] SPRITE_SCROLL_XOFFS,
+    input signed [12:0] SPRITE_SCROLL_YOFFS,
 
     output reg [14:0] OBJ_PIXEL
 );
@@ -317,22 +317,21 @@ always @(posedge CLK96, posedge RESET96) begin
                         xfl= GP9001RAM_GCU_DOUT[12]; //is x-flipped
                         priority_l= GP9001RAM_GCU_DOUT[11:8]; //get the sprite priority
 
-                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0];
+                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0] + 1;
                         sprite_y_pos_t = !mc ? 
                                             (GP9001RAM2_GCU_DOUT[15:7] + SPRITE_SCROLL_Y + SPRITE_SCROLL_YOFFS) & 'h1FF :
                                             (multiconnector_y + GP9001RAM2_GCU_DOUT[15:7]) & 'h1FF;
                         
-                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t + 1) << 3);
+                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t) << 3);
                         
-                        if(sprite_y_pos_t > 384) sprite_y_pos_t = sprite_y_pos_t - 'h200;
+                        if(sprite_y_pos_t >= 384 || (sprite_y_pos_t >= 448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
                         
-                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + ((sprite_y_size_t + 1) << 3))) begin 
+                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + (sprite_y_size_t << 3))) begin 
                             sprite_y_size_t = sprite_y_size_t - (-sprite_y_pos_t>>3);
                             sprite_y_pos_t = 0;
                         end
 
-                        
-                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + ((sprite_y_size_t + 1) << 3))) begin
+                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + (sprite_y_size_t << 3))) begin
                             $display("queue: %d, %d, %d, %h, %h, %h", VRENDER, sprite_y_size_t, sprite_y_pos_t, sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8]+1, priority_l, spr[7:0]);
                             wr_spr_q <= spr[7:0];
                             wr_spr_q_addr<=((priority_l<<11) | sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]);
@@ -459,7 +458,7 @@ always @(posedge CLK96, posedge RESET96) begin
                     sprite_y_size_t=sprite_y_size;
 
                     if(xflip) begin
-                        if($signed(sprite_x_pos-7) > (320 + 128)) begin
+                        if($signed(sprite_x_pos-7) >= 448) begin
                             sprite_x_pos <= $signed(sprite_x_pos - 'h200 - 'd7);
                         end
                         else begin
@@ -467,7 +466,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         end
                     end else begin
 
-                        if($signed(sprite_x_pos) > (512 - 128)) begin
+                        if($signed(sprite_x_pos) >= 384) begin
                             sprite_x_pos <= $signed(sprite_x_pos - 'h200);
                         end
                     end

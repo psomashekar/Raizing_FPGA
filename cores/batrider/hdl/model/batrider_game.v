@@ -367,7 +367,7 @@ TVRMCTL7 u_textvramctl (
     .PALRAM_DATA(PALRAM_DATA)
 );
 
-batrider_video u_video(
+raizing_video u_video(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(pxl_cen),

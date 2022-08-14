@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-module batrider_video (
+module raizing_video (
     input         CLK,
     input         CLK96,
     input         PIXEL_CEN,
@@ -123,7 +123,8 @@ hvsync_generator u_hvsync(
     .clk(CLK),
     .clk96(CLK96),
     .pxl_cen(PIXEL_CEN),
-    .reset(RESET96),
+    .reset(RESET),
+    .reset96(RESET96),
     .hsync(HS),
     .vsync(VS),
     .lhbl(LHBL),
@@ -134,7 +135,7 @@ hvsync_generator u_hvsync(
     .vrender(VRENDER)
 );
 
-batrider_pal u_pal (
+raizing_pal u_pal (
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -153,7 +154,7 @@ batrider_pal u_pal (
     .ACTIVE(ACTIVE)
 );
 
-batrider_colmix u_colmix(
+raizing_colmix u_colmix(
     .CLK(CLK),
     .CLK96(CLK96),
     .RESET(RESET),
@@ -168,7 +169,7 @@ batrider_colmix u_colmix(
     .ACTIVE(ACTIVE)
 );
 
-batrider_extratext u_extratext(
+raizing_extratext u_extratext(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -256,7 +257,7 @@ wire signed [12:0] TEXT_SCROLL_Y;
 wire signed [12:0] TEXT_SCROLL_XOFFS;
 wire signed [12:0] TEXT_SCROLL_YOFFS;
 
-batrider_obj u_obj(
+raizing_obj u_obj(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -291,7 +292,7 @@ batrider_obj u_obj(
     .OBJ_PIXEL(OBJ_PIXEL)
 );
 
-batrider_scroll u_scroll(
+raizing_scroll u_scroll(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -350,7 +351,7 @@ batrider_scroll u_scroll(
     .SCROLL2_PIXEL(SCROLL2_PIXEL)
 );
 
-batrider_gcu u_gcu(
+raizing_gcu u_gcu(
     .RESET(RESET),
     .RESET96(RESET96),
     .CLK(CLK),
@@ -371,6 +372,7 @@ batrider_gcu u_gcu(
     .DOUT(GP9001DOUT),
     .V(V),
     .H(H),
+    .LVBL(VB),
     .HSYNC(CPU_HSYNC),
     .VSYNC(CPU_VSYNC),
     .FBLANK(CPU_FBLANK),

@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-module garegga_video (
+module raizing_video (
     input         CLK,
     input         CLK96,
     input         PIXEL_CEN,
@@ -127,7 +127,7 @@ hvsync_generator u_hvsync(
     .vrender(VRENDER)
 );
 
-garegga_pal u_pal (
+raizing_pal u_pal (
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -145,7 +145,7 @@ garegga_pal u_pal (
     .BLUE(BLUE),
     .ACTIVE(ACTIVE)
 );
-garegga_colmix u_colmix(
+raizing_colmix u_colmix(
     .CLK(CLK),
     .CLK96(CLK96),
     .RESET(RESET),
@@ -160,7 +160,7 @@ garegga_colmix u_colmix(
     .ACTIVE(ACTIVE)
 );
 
-garegga_extratext u_extratext(
+raizing_extratext u_extratext(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -250,7 +250,7 @@ wire signed [12:0] TEXT_SCROLL_Y;
 wire signed [12:0] TEXT_SCROLL_XOFFS;
 wire signed [12:0] TEXT_SCROLL_YOFFS;
 
-garegga_obj u_obj(
+raizing_obj u_obj(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -285,7 +285,7 @@ garegga_obj u_obj(
     .OBJ_PIXEL(OBJ_PIXEL)
 );
 
-garegga_scroll u_scroll(
+raizing_scroll u_scroll(
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -344,7 +344,7 @@ garegga_scroll u_scroll(
     .SCROLL2_PIXEL(SCROLL2_PIXEL)
 );
 
-garegga_gcu u_gcu(
+raizing_gcu u_gcu(
     .RESET(RESET),
     .RESET96(RESET96),
     .CLK(CLK),
@@ -353,6 +353,7 @@ garegga_gcu u_gcu(
     .CS(GP9001CS),
     .ACK(GP9001ACK),
     .VINT(VINT),
+    .LVBL(VB),
     .GP9001_OP_SELECT_REG(GP9001_OP_SELECT_REG),
     .GP9001_OP_WRITE_REG(GP9001_OP_WRITE_REG),
     .GP9001_OP_WRITE_RAM(GP9001_OP_WRITE_RAM),

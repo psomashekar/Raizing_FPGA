@@ -2,4 +2,4 @@ incremental_db
 output_files
 db
 jtag.cdf
-bakraid.qws
+*.qws

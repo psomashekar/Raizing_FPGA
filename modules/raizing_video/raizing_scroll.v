@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-module batrider_scroll (
+module raizing_scroll (
     input CLK,
     input CLK96,
     input PIXEL_CEN,
@@ -138,7 +138,7 @@ reg scr1_start;
 wire scr2_busy, scr2_done;
 reg scr2_start;
 
-batrider_scroll_qr u_scroll0 (
+raizing_scroll_qr u_scroll0 (
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -168,7 +168,7 @@ batrider_scroll_qr u_scroll0 (
     .DEBUG_SCRN(0)
 );
 
-batrider_scroll_qr u_scroll1 (
+raizing_scroll_qr u_scroll1 (
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -198,7 +198,7 @@ batrider_scroll_qr u_scroll1 (
     .DEBUG_SCRN(1)
 );
 
-batrider_scroll_qr u_scroll2 (
+raizing_scroll_qr u_scroll2 (
     .CLK(CLK),
     .CLK96(CLK96),
     .PIXEL_CEN(PIXEL_CEN),
@@ -292,7 +292,7 @@ end
 endmodule
 
 // for queueing/ rendering the layers
-module batrider_scroll_qr (
+module raizing_scroll_qr (
     input CLK,
     input CLK96,
     input PIXEL_CEN,

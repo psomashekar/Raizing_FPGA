@@ -95,40 +95,34 @@ always @(posedge CLK96) begin
     peak <= peak_l | peak_r;
 end
 
+reg [7:0] gain1;
+reg signed [15:0] final_left;
+reg signed [13:0] final_oki0, final_oki1;
+always @(posedge CLK96) begin
+    final_left<=fm_left;
+    final_oki0<=oki0_pre;
+    final_oki1<=oki1_pre;
+    gain1<=pcmgain + (FX_LEVEL<<1);
+end
+
+assign right = left;
+assign peak_r = peak_l;
 jtframe_mixer #(.W0(16), .W1(14), .W2(14), .WOUT(16)) u_mix_left(
     .rst    ( RESET96       ),
     .clk    ( CLK96       ),
     .cen    ( 1'b1      ),
     // input signals
-    .ch0    ( fm_left   ),
-    .ch1    ( oki0_pre ),
-    .ch2    ( oki1_pre ),
+    .ch0    ( final_left   ),
+    .ch1    ( final_oki0 ),
+    .ch2    ( final_oki1 ),
     .ch3    ( 16'd0     ),
     // gain for each channel in 4.4 fixed point format
     .gain0  ( fmgain    ),
-    .gain1  ( pcmgain + (FX_LEVEL<<1)   ),
-    .gain2  ( pcmgain + (FX_LEVEL<<1)    ),
+    .gain1  ( gain1 ),
+    .gain2  ( gain1     ),
     .gain3  ( 8'd0     ),
     .mixed  ( left      ),
     .peak   ( peak_l    )
-);
-
-jtframe_mixer #(.W0(16), .W1(14), .W2(14), .WOUT(16)) u_mix_right(
-    .rst    ( RESET96       ),
-    .clk    ( CLK96       ),
-    .cen    ( 1'b1      ),
-    // input signals
-    .ch0    ( fm_right  ),
-    .ch1    ( oki0_pre  ),
-    .ch2    ( oki1_pre   ),
-    .ch3    ( 16'd0   ),
-    // gain for each channel in 4.4 fixed point format
-    .gain0  ( fmgain    ),
-    .gain1  ( pcmgain + (FX_LEVEL<<1)   ),
-    .gain2  ( pcmgain + (FX_LEVEL<<1)   ),
-    .gain3  ( 8'd0    ),
-    .mixed  ( right     ),
-    .peak   ( peak_r    )
 );
 
 //io
@@ -397,7 +391,7 @@ jt51 u_jt51(
     .right      (           ),
     // Full resolution output
     .xleft      ( fm_left   ),
-    .xright     ( fm_right  ),
+    .xright     (   ),
     // unsigned outputs for sigma delta converters, full resolution
     .dacleft    (           ),
     .dacright   (           )

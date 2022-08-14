@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-module bakraid_extratext (
+module raizing_extratext (
     input CLK,
     input CLK96,
     input PIXEL_CEN,
@@ -46,8 +46,12 @@ module bakraid_extratext (
 
     //text scroll ram
     output reg [7:0] TEXTSCROLL_ADDR,
-    input [15:0] TEXTSCROLL_DATA
+    input [15:0] TEXTSCROLL_DATA,
+
+    input [7:0] GAME
 );
+
+localparam GAREGGA = 'h0, KINGDMGP = 'h2, SSTRIKER = 'h1;
 
 reg [10:0] buf_data = 0;
 reg [8:0] buf_addr = 0;
@@ -59,7 +63,7 @@ reg [31:0] tile_data;
 reg [8:0] xpos;
 reg [7:0] st = 0;
 
-wire [5:0] extratoffs = 6'h2C;
+wire [5:0] extratoffs = GAME == SSTRIKER ? 6'h2B : 6'h2C;
 wire [11:0] textpal_offs = 12'h800;
 
 wire [5:0] tile_max=6'd41;
