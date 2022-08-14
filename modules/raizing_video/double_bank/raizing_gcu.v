@@ -420,6 +420,11 @@ wire [12:0] spriteram_buff_offs = cur_buf==0 ? 0 :
                                   cur_buf==2 ? 14'h800 :
                                   cur_buf==3 ? 14'h1000 :
                                   0;
+wire [12:0] spriteram_clear_buff_offs = cur_buf==3 ? 0 :
+                                        cur_buf==0 ? 14'h400 :
+                                        cur_buf==1 ? 14'h800 :
+                                        cur_buf==2 ? 14'h1000 :
+                                        0;
 wire [12:0] spriteram_buff_rd_offs = cur_buf_rd==0 ? 0 :
                                      cur_buf_rd==1 ? 13'h400 :
                                      cur_buf_rd==2 ? 13'h800 :
@@ -429,14 +434,43 @@ wire [12:0] spriteram_buff_rd_offs = cur_buf_rd==0 ? 0 :
 reg last_vb = 0;
 wire is_vb = LVBL; // start of vblank
 
+reg clear_buff;
+reg clear_buff_done;
+reg [12:0] clear_buff_addr;
+reg [9:0] clear_buff_counter;
+
 always @(posedge CLK96, posedge RESET96) begin
     if(RESET96) begin
         last_vb<=0;
         cur_buf<=0;
+        clear_buff<=0;
     end else begin
         last_vb<=is_vb;
         if(is_vb && !last_vb) begin //start of vblank, cut spriteram
-            cur_buf<=cur_buf+1;
+            cur_buf<=((cur_buf+1)%4);
+            clear_buff<=1;
+        end
+
+        if(clear_buff_counter=='h3FF) clear_buff<=0;
+    end
+end
+
+//clear buffer ahead
+always @(posedge CLK96, posedge RESET96) begin
+    if(RESET96) begin
+        clear_buff_addr<=0;
+        clear_buff_counter<=0;
+        clear_buff_done<=0;
+    end else begin
+        if(clear_buff) begin
+            if(clear_buff_counter=='h3FF) clear_buff_done<=1;
+            else clear_buff_done<=0;
+
+            clear_buff_addr<=clear_buff_counter+spriteram_clear_buff_offs;
+            clear_buff_counter<=clear_buff_counter+1;
+        end else begin
+            clear_buff_counter<=0;
+            clear_buff_done<=1;
         end
     end
 end
@@ -450,9 +484,9 @@ jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram(
         .we0(spriteram_we),
         .q0(),
         // Port 1
-        .data1(8'h0),
-        .addr1(GP9001RAM_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
-        .we1(1'b0),
+        .data1(16'h0),
+        .addr1(clear_buff && !clear_buff_done ? clear_buff_addr : GP9001RAM_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
+        .we1(clear_buff && !clear_buff_done),
         .q1(GP9001RAM_GCU_DOUT)
 );
 
@@ -465,9 +499,9 @@ jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram2(
         .we0(spriteram_we),
         .q0(),
         // Port 1
-        .data1(8'h0),
-        .addr1(GP9001RAM2_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
-        .we1(1'b0),
+        .data1(16'h0),
+        .addr1(clear_buff && !clear_buff_done ? clear_buff_addr : GP9001RAM2_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
+        .we1(clear_buff && !clear_buff_done),
         .q1(GP9001RAM2_GCU_DOUT)
 );
 
