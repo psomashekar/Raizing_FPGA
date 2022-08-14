@@ -324,7 +324,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         
                         if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t) << 3);
                         
-                        if(sprite_y_pos_t >= 384 || (sprite_y_pos_t >= 448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
+                        if(sprite_y_pos_t > 384 || (sprite_y_pos_t > 448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
                         
                         if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + (sprite_y_size_t << 3))) begin 
                             sprite_y_size_t = sprite_y_size_t - (-sprite_y_pos_t>>3);
@@ -458,7 +458,7 @@ always @(posedge CLK96, posedge RESET96) begin
                     sprite_y_size_t=sprite_y_size;
 
                     if(xflip) begin
-                        if($signed(sprite_x_pos-7) >= 448) begin
+                        if($signed(sprite_x_pos-7) > 448) begin
                             sprite_x_pos <= $signed(sprite_x_pos - 'h200 - 'd7);
                         end
                         else begin
@@ -466,7 +466,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         end
                     end else begin
 
-                        if($signed(sprite_x_pos) >= 384) begin
+                        if($signed(sprite_x_pos) > 384) begin
                             sprite_x_pos <= $signed(sprite_x_pos - 'h200);
                         end
                     end
