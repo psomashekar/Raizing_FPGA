@@ -410,11 +410,11 @@ wire spriteram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1800 && GP9001RAM_ADDR<
 
 //sprite lag fix
 reg [1:0] cur_buf = 0;
-wire [1:0] cur_buf_rd = cur_buf == 0 ? 2 :
-                        cur_buf == 1 ? 3 :
-                        cur_buf == 2 ? 0 :
-                        cur_buf == 3 ? 1 :
-                        0; //2 frames lag behind
+wire [1:0] cur_buf_rd = cur_buf == 0 ? 3 :
+                        cur_buf == 1 ? 0 :
+                        cur_buf == 2 ? 1 :
+                        cur_buf == 3 ? 2 :
+                        0; //1 frames lag behind
 wire [12:0] spriteram_buff_offs = cur_buf==0 ? 0 :
                                   cur_buf==1 ? 14'h400 :
                                   cur_buf==2 ? 14'h800 :

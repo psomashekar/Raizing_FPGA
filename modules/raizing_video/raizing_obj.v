@@ -317,7 +317,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         xfl= GP9001RAM_GCU_DOUT[12]; //is x-flipped
                         priority_l= GP9001RAM_GCU_DOUT[11:8]; //get the sprite priority
 
-                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0] + 1 + 1;
+                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0] + 1;
                         sprite_y_pos_t = !mc ? 
                                             (GP9001RAM2_GCU_DOUT[15:7] + SPRITE_SCROLL_Y + SPRITE_SCROLL_YOFFS) & 'h1FF :
                                             (multiconnector_y + GP9001RAM2_GCU_DOUT[15:7]) & 'h1FF;
