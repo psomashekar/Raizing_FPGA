@@ -403,10 +403,10 @@ wire spriteram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1800 && GP9001RAM_ADDR<
 //sprite lag fix
 reg [1:0] cur_buf = 0;
 wire [1:0] cur_buf_rd = GAME==GAREGGA ? 
-                        (cur_buf == 0 ? 2 :
-                        cur_buf == 1 ? 3 :
-                        cur_buf == 2 ? 0 :
-                        cur_buf == 3 ? 1 :
+                        (cur_buf == 0 ? 3 :
+                        cur_buf == 1 ? 0 :
+                        cur_buf == 2 ? 1 :
+                        cur_buf == 3 ? 2 :
                         0) :  //2 frames lag behind
                         (cur_buf == 0 ? 0 :
                         cur_buf == 1 ? 1 :
@@ -418,11 +418,6 @@ wire [12:0] spriteram_buff_offs = cur_buf==0 ? 0 :
                                   cur_buf==2 ? 14'h800 :
                                   cur_buf==3 ? 14'h1000 :
                                   0;
-wire [12:0] spriteram_clear_buff_offs = cur_buf==3 ? 0 :
-                                        cur_buf==0 ? 14'h400 :
-                                        cur_buf==1 ? 14'h800 :
-                                        cur_buf==2 ? 14'h1000 :
-                                        0;
 wire [12:0] spriteram_buff_rd_offs = cur_buf_rd==0 ? 0 :
                                      cur_buf_rd==1 ? 13'h400 :
                                      cur_buf_rd==2 ? 13'h800 :
@@ -502,9 +497,9 @@ jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram(
         .clk0(CLK96),
         .clk1(CLK96),
         // Port 0
-        .data0(clear_buff_data),
-        .addr0(clear_buff_addr + spriteram_buff_offs),
-        .we0(clear_buff && !clear_buff_done),
+        .data0(GAME == GAREGGA ? clear_buff_data : GP9001RAM_DIN),
+        .addr0(GAME == GAREGGA ? clear_buff_addr + spriteram_buff_offs : GP9001RAM_ADDR[9:0] + spriteram_buff_offs),
+        .we0(GAME == GAREGGA ? clear_buff && !clear_buff_done : spriteram_we),
         .q0(),
         // Port 1
         .data1(16'h0),
@@ -517,9 +512,9 @@ jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram2(
         .clk0(CLK96),
         .clk1(CLK96),
         // Port 0
-        .data0(clear_buff_data),
-        .addr0(clear_buff_addr + spriteram_buff_offs),
-        .we0(clear_buff && !clear_buff_done),
+        .data0(GAME == GAREGGA ? clear_buff_data : GP9001RAM_DIN),
+        .addr0(GAME == GAREGGA ? clear_buff_addr + spriteram_buff_offs : GP9001RAM_ADDR[9:0] + spriteram_buff_offs),
+        .we0(GAME == GAREGGA ? clear_buff && !clear_buff_done : spriteram_we),
         .q0(),
         // Port 1
         .data1(16'h0),

@@ -410,17 +410,11 @@ wire spriteram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1800 && GP9001RAM_ADDR<
 
 //sprite lag fix
 reg [1:0] cur_buf = 0;
-wire [1:0] cur_buf_rd = GAME==GAREGGA ? 
-                        (cur_buf == 0 ? 2 :
-                        cur_buf == 1 ? 3 :
-                        cur_buf == 2 ? 0 :
-                        cur_buf == 3 ? 1 :
-                        0) :  //2 frames lag behind
-                        (cur_buf == 0 ? 0 :
+wire [1:0] cur_buf_rd = cur_buf == 0 ? 0 :
                         cur_buf == 1 ? 1 :
                         cur_buf == 2 ? 2 :
                         cur_buf == 3 ? 3 :
-                        0); //0 frames lag behind
+                        0; //1 frames lag behind
 wire [12:0] spriteram_buff_offs = cur_buf==0 ? 0 :
                                   cur_buf==1 ? 14'h400 :
                                   cur_buf==2 ? 14'h800 :
@@ -453,7 +447,7 @@ always @(posedge CLK96, posedge RESET96) begin
         clear_buff<=0;
     end else begin
         last_vb<=is_vb;
-        if(is_vb && !last_vb && GAME == GAREGGA) begin //start of vblank, cut spriteram disable for sorcer and kingdom for now
+        if(is_vb && !last_vb) begin //start of vblank, cut spriteram disable for sorcer and kingdom for now
             cur_buf<=((cur_buf+1)%4);
             clear_buff<=1;
         end
