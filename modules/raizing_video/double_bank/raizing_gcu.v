@@ -410,11 +410,17 @@ wire spriteram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1800 && GP9001RAM_ADDR<
 
 //sprite lag fix
 reg [1:0] cur_buf = 0;
-wire [1:0] cur_buf_rd = cur_buf == 0 ? 3 :
-                        cur_buf == 1 ? 0 :
-                        cur_buf == 2 ? 1 :
-                        cur_buf == 3 ? 2 :
-                        0; //1 frames lag behind
+wire [1:0] cur_buf_rd = GAME==GAREGGA ? 
+                        (cur_buf == 0 ? 2 :
+                        cur_buf == 1 ? 3 :
+                        cur_buf == 2 ? 0 :
+                        cur_buf == 3 ? 1 :
+                        0) :  //2 frames lag behind
+                        (cur_buf == 0 ? 0 :
+                        cur_buf == 1 ? 1 :
+                        cur_buf == 2 ? 2 :
+                        cur_buf == 3 ? 3 :
+                        0); //0 frames lag behind
 wire [12:0] spriteram_buff_offs = cur_buf==0 ? 0 :
                                   cur_buf==1 ? 14'h400 :
                                   cur_buf==2 ? 14'h800 :
@@ -438,6 +444,7 @@ reg clear_buff;
 reg clear_buff_done;
 reg [12:0] clear_buff_addr;
 reg [9:0] clear_buff_counter;
+wire [15:0] clear_buff_data;
 
 always @(posedge CLK96, posedge RESET96) begin
     if(RESET96) begin
@@ -446,7 +453,7 @@ always @(posedge CLK96, posedge RESET96) begin
         clear_buff<=0;
     end else begin
         last_vb<=is_vb;
-        if(is_vb && !last_vb) begin //start of vblank, cut spriteram
+        if(is_vb && !last_vb && GAME == GAREGGA) begin //start of vblank, cut spriteram disable for sorcer and kingdom for now
             cur_buf<=((cur_buf+1)%4);
             clear_buff<=1;
         end
@@ -456,37 +463,61 @@ always @(posedge CLK96, posedge RESET96) begin
 end
 
 //clear buffer ahead
+reg c;
 always @(posedge CLK96, posedge RESET96) begin
     if(RESET96) begin
         clear_buff_addr<=0;
         clear_buff_counter<=0;
         clear_buff_done<=0;
+        c<=0;
     end else begin
         if(clear_buff) begin
-            if(clear_buff_counter=='h3FF) clear_buff_done<=1;
-            else clear_buff_done<=0;
+            c<=c+1;
+            case(c)
+                0: begin
+                    clear_buff_addr<=clear_buff_counter;
+                    clear_buff_counter<=clear_buff_counter+1;
 
-            clear_buff_addr<=clear_buff_counter+spriteram_clear_buff_offs;
-            clear_buff_counter<=clear_buff_counter+1;
+                    if(clear_buff_addr=='h3FF) clear_buff_done<=1;
+                    else clear_buff_done<=0;
+                end
+                1: ; //wait state
+            endcase
         end else begin
             clear_buff_counter<=0;
             clear_buff_done<=1;
+            c<=0;
         end
     end
 end
+
+jtframe_dual_ram #(.dw(16), .aw(10)) u_spriteram_o(
+        .clk0(CLK96),
+        .clk1(CLK96),
+        // Port 0
+        .data0(GP9001RAM_DIN),
+        .addr0(GP9001RAM_ADDR[9:0]),
+        .we0(spriteram_we),
+        .q0(),
+        // Port 1
+        .data1(16'h0),
+        .addr1(clear_buff_addr),
+        .we1(1'b0),
+        .q1(clear_buff_data)
+);
 
 jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram(
         .clk0(CLK96),
         .clk1(CLK96),
         // Port 0
-        .data0(GP9001RAM_DIN),
-        .addr0(GP9001RAM_ADDR[9:0] + spriteram_buff_offs),
-        .we0(spriteram_we),
+        .data0(clear_buff_data),
+        .addr0(clear_buff_addr + spriteram_buff_offs),
+        .we0(clear_buff && !clear_buff_done),
         .q0(),
         // Port 1
         .data1(16'h0),
-        .addr1(clear_buff && !clear_buff_done ? clear_buff_addr : GP9001RAM_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
-        .we1(clear_buff && !clear_buff_done),
+        .addr1(GP9001RAM_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
+        .we1(1'b0),
         .q1(GP9001RAM_GCU_DOUT)
 );
 
@@ -494,14 +525,14 @@ jtframe_dual_ram #(.dw(16), .aw(13)) u_spriteram2(
         .clk0(CLK96),
         .clk1(CLK96),
         // Port 0
-        .data0(GP9001RAM_DIN),
-        .addr0(GP9001RAM_ADDR[9:0] + spriteram_buff_offs),
-        .we0(spriteram_we),
+        .data0(clear_buff_data),
+        .addr0(clear_buff_addr + spriteram_buff_offs),
+        .we0(clear_buff && !clear_buff_done),
         .q0(),
         // Port 1
         .data1(16'h0),
-        .addr1(clear_buff && !clear_buff_done ? clear_buff_addr : GP9001RAM2_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
-        .we1(clear_buff && !clear_buff_done),
+        .addr1(GP9001RAM2_GCU_ADDR[9:0] + spriteram_buff_rd_offs),
+        .we1(1'b0),
         .q1(GP9001RAM2_GCU_DOUT)
 );
 
