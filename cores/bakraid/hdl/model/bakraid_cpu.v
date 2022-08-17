@@ -422,7 +422,7 @@ jtframe_68kdtack u_dtack(
     .cpu_cenb   (CEN16B),
     .bus_cs     (bus_cs),
     .bus_busy   (bus_busy),
-    .bus_legit  (bus_legit),
+    .bus_legit  (1'b0),
     .ASn        (ASn),
     .DSn        ({UDSn, LDSn}),
     .num        (4'd1),
