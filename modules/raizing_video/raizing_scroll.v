@@ -30,6 +30,7 @@ module raizing_scroll (
     input ACTIVE,
     input HB,
     input VB,
+    input FLIPX,
 
     //interface with scroll ram
      output [12:0] SCR0_GP9001RAM_GCU_ADDR,
@@ -149,6 +150,7 @@ raizing_scroll_qr u_scroll0 (
     .ACTIVE(ACTIVE),
     .HB(HB),
     .VB(VB),
+    .FLIPX(FLIPX),
     .SCR_GP9001RAM_GCU_ADDR(SCR0_GP9001RAM_GCU_ADDR),
     .SCR_GP9001RAM_GCU_DOUT(SCR0_GP9001RAM_GCU_DOUT),
     .SCROLL_X_POS(BACKGROUND_SCROLL_X+BACKGROUND_SCROLL_XOFFS),
@@ -179,6 +181,7 @@ raizing_scroll_qr u_scroll1 (
     .ACTIVE(ACTIVE),
     .HB(HB),
     .VB(VB),
+    .FLIPX(FLIPX),
     .SCR_GP9001RAM_GCU_ADDR(SCR1_GP9001RAM_GCU_ADDR),
     .SCR_GP9001RAM_GCU_DOUT(SCR1_GP9001RAM_GCU_DOUT),
     .SCROLL_X_POS(FOREGROUND_SCROLL_X+FOREGROUND_SCROLL_XOFFS),
@@ -209,6 +212,7 @@ raizing_scroll_qr u_scroll2 (
     .ACTIVE(ACTIVE),
     .HB(HB),
     .VB(VB),
+    .FLIPX(FLIPX),
     .SCR_GP9001RAM_GCU_ADDR(SCR2_GP9001RAM_GCU_ADDR),
     .SCR_GP9001RAM_GCU_DOUT(SCR2_GP9001RAM_GCU_DOUT),
     .SCROLL_X_POS(TEXT_SCROLL_X+TEXT_SCROLL_XOFFS),
@@ -303,7 +307,7 @@ module raizing_scroll_qr (
     input ACTIVE,
     input HB,
     input VB,
-
+    input FLIPX,
     output reg [12:0] SCR_GP9001RAM_GCU_ADDR,
     input  [15:0] SCR_GP9001RAM_GCU_DOUT,
 
@@ -600,20 +604,20 @@ always @(posedge CLK96, posedge RESET96) begin
                         if(tile_x_pos <= -16 || tile_x_pos >=320) begin
                             if(tile_x_pos > -tx && tile_x_pos < (320-tx)) begin
                                 // $display("line: %d, priority: %d, x:%d", VRENDER, priority_i, (sprite_x_pos+tx)&'h1FF);
-                                BUF_ADDR<=(tile_x_pos+tx)&'h1FF;
+                                BUF_ADDR<=(FLIPX ? 320-(tile_x_pos+tx) : (tile_x_pos+tx))&'h1FF;
                                 BUF_DATA<=(priority_i[3:0] << 12) + tile_palette + tile_code;
                             end
                         end else if((tile_x_pos > -16 && tile_x_pos <320)) begin
                             // $display("%h, %d, %d, %h, %h, %h", sprite_num, VRENDER, buf_code, palette, sprite_code, palette+sprite_code);
                             // $display("line: %d, priority: %d, x:%d", VRENDER, priority_i, buf_code&'h1FF);
-                            BUF_ADDR<=buf_code&'h1FF;
+                            BUF_ADDR<=(FLIPX ? 320-buf_code : buf_code)&'h1FF;
                             BUF_DATA<=(priority_i[3:0] << 12) + tile_palette + tile_code;
                         end else begin //sprite is out of bounds
-                            BUF_ADDR<=buf_code&'h1ff;
+                            BUF_ADDR<=(FLIPX ? 320-buf_code : buf_code)&'h1ff;
                             BUF_DATA<=0;                      
                         end
                     end else begin
-                        BUF_ADDR<=buf_code&'h1ff;
+                        BUF_ADDR<=(FLIPX ? 320-buf_code : buf_code)&'h1ff;
                         BUF_DATA<=0;
                     end
 

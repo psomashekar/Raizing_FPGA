@@ -101,7 +101,9 @@ module raizing_video (
     input   [8:0] HS_START,
     input   [8:0] HS_END,
     input   [8:0] VS_START,
-    input   [8:0] VS_END
+    input   [8:0] VS_END,
+
+    input FLIP
 );
 
 wire ACTIVE;
@@ -132,7 +134,8 @@ hvsync_generator u_hvsync(
     .display_on(ACTIVE),
     .hpos(H),
     .vpos(V),
-    .vrender(VRENDER)
+    .vrender(VRENDER),
+    .flip(FLIP)
 );
 
 raizing_pal u_pal (
@@ -180,6 +183,7 @@ raizing_extratext u_extratext(
     .ACTIVE(ACTIVE),
     .HB(HB),
     .VB(VB),
+    .FLIPX(FLIP),
 
     //text rom
     .TEXTROM_ADDR(TEXTROM_ADDR),
@@ -268,6 +272,7 @@ raizing_obj u_obj(
     .ACTIVE(ACTIVE),
     .HB(HB),
     .VB(VB),
+    .FLIPX(FLIP),
 
     //interface with GP9001 RAM Mirror
     .GP9001RAM_GCU_ADDR(GP9001RAM_GCU_ADDR),
@@ -303,6 +308,7 @@ raizing_scroll u_scroll(
     .ACTIVE(ACTIVE),
     .HB(HB),
     .VB(VB),
+    .FLIPX(FLIP),
 
     .SCR0_GP9001RAM_GCU_ADDR(SCR0_GP9001RAM_GCU_ADDR),
     .SCR0_GP9001RAM_GCU_DOUT(SCR0_GP9001RAM_GCU_DOUT),

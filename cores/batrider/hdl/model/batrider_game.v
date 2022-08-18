@@ -108,6 +108,7 @@ wire CLK = clk48;
 wire CLK96 = clk;
 wire RESET96 = rst;
 wire CEN16, CEN16B;
+wire FLIP = dipsw[16]; //dipswitch bit 16 in SYS
 // assign game_led = downloading ? 1'b0 : 1'b1;
 
 /*CLOCKS*/
@@ -220,7 +221,8 @@ wire Z80CS, Z80WAIT, SNDIRQ;
 wire BUSACK, BR;
 
 //dip switch
-wire [23:0] DIPSW = dipsw[23:0];
+//make the game always think it's in normal orientation (no flip)
+wire [23:0] DIPSW = {dipsw[23:17], 1'b0, dipsw[15:0]}; //bit 16
 wire DIP_TEST = dip_test;
 wire DIP_PAUSE = dip_pause;
 wire [ 7:0] DIPSW_C, DIPSW_B, DIPSW_A;
@@ -244,6 +246,7 @@ batrider_cpu u_cpu (
     .DOUT(CPU_DOUT),
     .LVBL(LVBLL), //this is low active to the CPU
     .V(V),
+    .FLIP(FLIP),
     
     //inputs
     .JOYMODE(0),
@@ -444,7 +447,8 @@ raizing_video u_video(
     .V(V),
     .RED(red),
     .GREEN(green),
-    .BLUE(blue)
+    .BLUE(blue),
+    .FLIP(FLIP)
 );
 
 batrider_sound u_sound(

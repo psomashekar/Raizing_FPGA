@@ -109,6 +109,9 @@ wire CLK = clk48;
 wire CLK96 = clk;
 wire RESET96 = rst;
 wire CEN16, CEN16B;
+wire FLIP = GAME==GAREGGA ? dipsw[10] : //dipswitch bit 10 in DSWB
+            GAME==SSTRIKER || GAME==KINGDMGP ? dipsw[1] : //dipswitch 1
+            0;
 // assign game_led = downloading ? 1'b0 : 1'b1;
 
 /*CLOCKS*/
@@ -204,7 +207,10 @@ wire BUSACK;
 wire BR = 1'b0;
 
 //dip switch
-wire [23:0] DIPSW = dipsw[23:0];
+//make the game always think it's in normal orientation (no flip)
+wire [23:0] DIPSW = GAME == GAREGGA ? {dipsw[23:11], 1'b0, dipsw[9:0]} : //bit 10
+                    GAME == KINGDMGP || GAME == SSTRIKER ? {dipsw[23:2], 1'b0, dipsw[0]} : //bit 1
+                    dipsw[23:0];
 wire DIP_TEST = dip_test;
 wire DIP_PAUSE = dip_pause;
 wire [ 7:0] DIPSW_C, DIPSW_B, DIPSW_A;
@@ -245,6 +251,7 @@ garegga_cpu u_cpu (
     .DOUT(CPU_DOUT),
     .LVBL(LVBLL), //this is low active to the CPU
     .V(V),
+    .FLIP(FLIP),
     
     //inputs
     .JOYMODE(0),
@@ -375,7 +382,8 @@ raizing_video u_video(
     .TEXTSCROLL_ADDR(TEXTSCROLL_ADDR),
     .TEXTSCROLL_DATA(TEXTSCROLL_DATA),
 
-    .GAME(GAME)
+    .GAME(GAME),
+    .FLIP(FLIP)
 );
 
 wire ym2151_cen, ym2151_cen2, oki_cen, z80_cen;
