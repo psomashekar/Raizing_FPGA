@@ -71,5 +71,5 @@
         <dip name="Invincible" bits="20" ids="Off,On"/>
         <dip name="Score Ranking" bits="21" ids="On,Off"/>
     </switches>
-    <buttons names="Shot,Bomb,Formation,Start,Coin,Pause" default="Y,X,B,R,L,Start" count="3"/>
+    <buttons names="Shot,Bomb,Formation,ABC,Start,Coin,Pause" default="Y,X,B,A,R,L,Start" count="4"/>
 </misterromdescription>

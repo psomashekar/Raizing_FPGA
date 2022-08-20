@@ -59,5 +59,5 @@
         <dip name="Allow Continue" bits="18" ids="Yes,No"/>
         <dip name="Stage Edit" bits="19" ids="Off,On"/>
     </switches>
-    <buttons names="Shot,Bomb,Formation,Start,Coin,Pause" default="Y,X,B,R,L,Start" count="3"/>
+    <buttons names="Shot,Bomb,Formation,ABC,Start,Coin,Pause" default="Y,X,B,A,R,L,Start" count="4"/>
 </misterromdescription>

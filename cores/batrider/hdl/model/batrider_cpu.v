@@ -321,8 +321,8 @@ wire [15:0] video_status = V < 256 ? (video_status_hs & video_status_vs & video_
 
 //JTFRAME is low active, but batrider is high active.
 
-wire [7:0] p1_ctrl = {1'b0, ~JOYSTICK1[6],~JOYSTICK1[5],~JOYSTICK1[4],~JOYSTICK1[0],~JOYSTICK1[1],~JOYSTICK1[2],~JOYSTICK1[3]};
-wire [7:0] p2_ctrl = {1'b0, ~JOYSTICK2[6],~JOYSTICK2[5],~JOYSTICK2[4],~JOYSTICK2[0],~JOYSTICK2[1],~JOYSTICK2[2],~JOYSTICK2[3]};
+wire [7:0] p1_ctrl = {1'b0, ~JOYSTICK1[6]|~JOYSTICK1[7],~JOYSTICK1[5]|~JOYSTICK1[7],~JOYSTICK1[4]|~JOYSTICK1[7],~JOYSTICK1[0],~JOYSTICK1[1],~JOYSTICK1[2],~JOYSTICK1[3]};
+wire [7:0] p2_ctrl = {1'b0, ~JOYSTICK2[6]|~JOYSTICK2[7],~JOYSTICK2[5]|~JOYSTICK2[7],~JOYSTICK2[4]|~JOYSTICK2[7],~JOYSTICK2[0],~JOYSTICK2[1],~JOYSTICK2[2],~JOYSTICK2[3]};
 always @(posedge CLK96) begin
     if(RESET96) cpu_din <= 16'h0000;
     else begin
