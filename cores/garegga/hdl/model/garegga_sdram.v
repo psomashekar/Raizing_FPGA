@@ -122,7 +122,14 @@ module garegga_sdram #(
 	input  [13:0] TEXTROM_ADDR,
 	output [15:0] TEXTROM_DOUT,
 
-	output reg [7:0] GAME
+	output reg [7:0] GAME,
+
+	//hiscores
+	input		  HISCORE_CS,
+	input   [1:0] HISCORE_WE,
+	input   [7:0] HISCORE_DIN,
+	output  [7:0] HISCORE_DOUT,
+	input   [7:0] HISCORE_ADDR 
 );
 
 //loader
@@ -353,6 +360,26 @@ jtframe_dual_ram16 #(.aw(14)) u_textrom(
     .addr1(TEXTROM_ADDR),
     .we1(2'b00),
     .q1(TEXTROM_DOUT)
+);
+
+//hiscore table
+wire dump_we = IOCTL_WR & IOCTL_RAM;
+wire [7:0] hiscore_q1;
+assign IOCTL_DIN = hiscore_q1;
+
+jtframe_dual_ram #(.dw(8), .aw(8)) u_hiscore_table(
+    .clk0   ( CLK  ),
+    .clk1   ( CLK  ),
+    // First port: internal use
+    .addr0  ( HISCORE_ADDR  ),
+    .data0  ( HISCORE_DIN   ),
+    .we0    ( HISCORE_WE    ),
+    .q0     ( HISCORE_DOUT  ),
+    // Second port: dump
+    .addr1  ( IOCTL_ADDR[7:0] ),
+    .data1  ( IOCTL_DOUT  ),
+    .we1    ( dump_we ),
+    .q1     ( hiscore_q1 )
 );
 
 endmodule

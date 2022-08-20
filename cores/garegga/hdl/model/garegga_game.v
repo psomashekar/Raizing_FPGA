@@ -221,6 +221,13 @@ wire HSYNC, VSYNC, FBLANK;
 wire LHBLL, LVBLL;
 wire [8:0] V;
 
+//hiscore
+wire		 HISCORE_CS;
+wire   [1:0] HISCORE_WE;
+wire   [7:0] HISCORE_DIN;
+wire   [7:0] HISCORE_DOUT;
+wire   [7:0] HISCORE_ADDR;
+
 //vrams
 wire [13:0] TEXTROM_ADDR;
 wire [15:0] TEXTROM_DATA;
@@ -310,7 +317,14 @@ garegga_cpu u_cpu (
     .TEXTSCROLL_ADDR(TEXTSCROLL_ADDR),
     .TEXTSCROLL_DATA(TEXTSCROLL_DATA),
 
-    .GAME(GAME)
+    .GAME(GAME),
+
+    //hiscore interface
+    .HISCORE_CS(HISCORE_CS),
+	.HISCORE_WE(HISCORE_WE),
+	.HISCORE_DIN(HISCORE_DIN),
+	.HISCORE_DOUT(HISCORE_DOUT),
+	.HISCORE_ADDR(HISCORE_ADDR) 
 );
 
 raizing_video u_video(
@@ -514,7 +528,14 @@ garegga_sdram u_sdram (
     .TEXTROM_ADDR(TEXTROM_ADDR),
     .TEXTROM_DOUT(TEXTROM_DATA),
 
-    .GAME(GAME)
+    .GAME(GAME),
+
+    //hiscore interface
+    .HISCORE_CS(HISCORE_CS),
+	.HISCORE_WE(HISCORE_WE),
+	.HISCORE_DIN(HISCORE_DIN),
+	.HISCORE_DOUT(HISCORE_DOUT),
+	.HISCORE_ADDR(HISCORE_ADDR)
 );
 
 endmodule
