@@ -234,6 +234,14 @@ wire LHBLL, LVBLL;
 wire [8:0] V;
 //cpu
 wire TVRAM_BR;
+
+//hiscore
+wire		 HISCORE_CS;
+wire   [1:0] HISCORE_WE;
+wire  [15:0] HISCORE_DIN;
+wire  [15:0] HISCORE_DOUT;
+wire   [8:0] HISCORE_ADDR;
+
 batrider_cpu u_cpu (
     .CLK(CLK),
     .CLK96(CLK96),
@@ -316,7 +324,14 @@ batrider_cpu u_cpu (
     //main ram for DMA
     .DMA_RAM_CS(DMA_RAM_CS),
     .DMA_RAM_DOUT(DMA_RAM_DOUT),
-    .DMA_RAM_ADDR(DMA_RAM_ADDR)
+    .DMA_RAM_ADDR(DMA_RAM_ADDR),
+
+    //hiscore interface
+    .HISCORE_CS(HISCORE_CS),
+	.HISCORE_WE(HISCORE_WE),
+	.HISCORE_DIN(HISCORE_DIN),
+	.HISCORE_DOUT(HISCORE_DOUT),
+	.HISCORE_ADDR(HISCORE_ADDR) 
 );
 
 //text VRAM controller TVRMCTL7
@@ -580,7 +595,14 @@ batrider_sdram u_sdram (
     .PCM1_CS(PCM1_CS),
     .PCM1_OK(PCM1_OK),
     .PCM1_ADDR(PCM1_ADDR),
-    .PCM1_DOUT(PCM1_DOUT)
+    .PCM1_DOUT(PCM1_DOUT),
+
+    //hiscore interface
+    .HISCORE_CS(HISCORE_CS),
+	.HISCORE_WE(HISCORE_WE),
+	.HISCORE_DIN(HISCORE_DIN),
+	.HISCORE_DOUT(HISCORE_DOUT),
+	.HISCORE_ADDR(HISCORE_ADDR)
 );
 
 endmodule

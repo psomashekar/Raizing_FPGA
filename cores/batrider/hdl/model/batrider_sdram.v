@@ -121,7 +121,14 @@ module batrider_sdram #(
 	input 		  PCM1_CS,
 	output 		  PCM1_OK,
 	input  [20:0] PCM1_ADDR,
-	output [7:0]  PCM1_DOUT
+	output [7:0]  PCM1_DOUT,
+
+	//hiscores
+	input		  HISCORE_CS,
+	input   [1:0] HISCORE_WE,
+	input  [15:0] HISCORE_DIN,
+	output [15:0] HISCORE_DOUT,
+	input   [8:0] HISCORE_ADDR 
 );
 
 //loader
@@ -378,5 +385,24 @@ jtframe_rom_4slots #(
 	.data_read   (DATA_READ)
 );
 
+//hiscore table
+//20fa20-20fD2F mainram
+wire dump_we = IOCTL_WR & IOCTL_RAM;
+wire [15:0] hiscore_q1;
+assign IOCTL_DIN = IOCTL_ADDR[0] ? hiscore_q1[7:0] : hiscore_q1[15:8];
+jtframe_dual_ram16 #(.aw(9)) u_hiscore_table(
+    .clk0   ( CLK  ),
+    .clk1   ( CLK  ),
+    // First port: internal use
+    .addr0  ( HISCORE_ADDR  ),
+    .data0  ( HISCORE_DIN   ),
+    .we0    ( HISCORE_WE    ),
+    .q0     ( HISCORE_DOUT  ),
+    // Second port: dump
+    .addr1  ( IOCTL_ADDR[9:1] ),
+    .data1  ( {2{IOCTL_DOUT}}  ),
+    .we1    ( {dump_we && !IOCTL_ADDR[0], dump_we && IOCTL_ADDR[0]} ),
+    .q1     ( hiscore_q1 )
+);
 
 endmodule
