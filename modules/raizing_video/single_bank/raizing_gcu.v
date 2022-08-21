@@ -225,9 +225,8 @@ always @(cur_scr_reg_num, V, RESET96) begin
     if(RESET96) begin
         VINT<=1'b1;
     end else begin
-        if(V == 8'E6) VINT<=1'b0;
         if(cur_scr_reg_num == 8'h0F || cur_scr_reg_num == 8'h8F || cur_scr_reg_num == 8'h0e) VINT<=1'b1;
-        else VINT<=1'b1;
+        else if(V == 8'hE6) VINT<=1'b0;
     end
 end
 

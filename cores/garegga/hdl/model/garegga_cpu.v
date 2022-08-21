@@ -106,14 +106,14 @@ module garegga_cpu (
     input SRAM_WE,
     input Z80WAIT,
     output reg Z80INT,
-    output reg [7:0] OKI_BANK,
+    output reg OKI_BANK,
 
     //hiscore interface
     output		   HISCORE_CS,
 	output   [1:0] HISCORE_WE,
-	output   [7:0] HISCORE_DIN,
-	input    [7:0] HISCORE_DOUT,
-	output   [7:0] HISCORE_ADDR 
+	output   [15:0] HISCORE_DIN,
+	input    [15:0] HISCORE_DOUT,
+	output   [6:0] HISCORE_ADDR 
 );
 
 localparam GAREGGA = 'h0, KINGDMGP = 'h2, SSTRIKER = 'h1;
@@ -155,14 +155,13 @@ wire [15:0] main_vram_q1;
 reg sel_hiscore;
 wire [23:0] addr_8_plus = {A[23:1], UDSn && !LDSn}; //makes it easier for odd address boundaries
 assign HISCORE_CS = sel_hiscore;
-assign HISCORE_ADDR = GAME == GAREGGA && (addr_8_plus >='h10CA4D) && (addr_8_plus<'h10CA4D+'hEA) ? (addr_8_plus-'h10CA4D) : //length:234
-                      GAME == GAREGGA && (addr_8_plus=='h100030) ? ((addr_8_plus-'h100030)+'hEA) : //length: 1
-                      GAME == SSTRIKER && (addr_8_plus>='h10029a) && (addr_8_plus<'h10029a+'hA4) ? (addr_8_plus-'h10029A) : //length:164
-                      GAME == KINGDMGP && (addr_8_plus>='h1002D0) && (addr_8_plus<'h1002D0+'h9E) ? (addr_8_plus-'h1002D0) : //length:158
-                      GAME == KINGDMGP && (addr_8_plus>='h1003C4) && (addr_8_plus<'h1003C4+'h53) ? ((addr_8_plus-'h1003C4)+'h9E) : //length:83
+assign HISCORE_ADDR = GAME == GAREGGA && (addr_8 >='h10CA4C) && (addr_8<'h10CA4C+'hEC) ? (addr_8-'h10CA4C)>>1 : //length:236
+                      GAME == SSTRIKER && (addr_8>='h10029a) && (addr_8<'h10029a+'hA4) ? (addr_8-'h10029A)>>1 : //length:164
+                      GAME == KINGDMGP && (addr_8>='h1002D0) && (addr_8<'h1002D0+'h9E) ? (addr_8-'h1002D0)>>1 : //length:158
+                      GAME == KINGDMGP && (addr_8>='h1003C4) && (addr_8<'h1003C4+'h54) ? ((addr_8-'h1003C4)+'h9E)>>1 : //length:84
                       'hx;
-assign HISCORE_DIN = UDSn && !LDSn ? cpu_dout[7:0] : cpu_dout[15:8];
-assign HISCORE_WE = {sel_hiscore && !RW} & (&hiscore_init);
+assign HISCORE_DIN = cpu_dout;
+assign HISCORE_WE = {sel_hiscore && !RW && !UDSn, sel_hiscore && !RW && !LDSn} & {2{&hiscore_init}};
 
 //the first 19 bits are used to address other devices (ie. ROM/RAM). The rest are used for selects.
 assign ADDR[19:1] = A[19:1];
@@ -236,13 +235,13 @@ reg gp9001_vdp_device_r_cs, gp9001_vdp_device_w_cs, read_port_in1_r_cs, read_por
  initial fd = $fopen("log.txt", "w");
 `endif
 
-wire hiscore_init_end_0 = GAME == GAREGGA ? addr_8_plus=='h10CB36 && cpu_dout[7:0] == 'h2A :
+wire hiscore_init_end_0 = GAME == GAREGGA ? addr_8_plus=='h10CB36 && cpu_dout[15:8] == 'h2A :
                           GAME == SSTRIKER ? addr_8_plus=='h10033D && cpu_dout[7:0] == 'h20 :
                           GAME == KINGDMGP ? addr_8_plus=='h10036D && cpu_dout[7:0] == 'h4E :
                           'h0;
-wire hiscore_init_end_1 = GAME == GAREGGA ? addr_8_plus == 'h100030 && cpu_dout[7:0] == 'h72 :
+wire hiscore_init_end_1 = GAME == GAREGGA ? 1 :
                           GAME == SSTRIKER ? 1 :
-                          GAME == KINGDMGP ? addr_8_plus == 'h100416 && cpu_dout[7:0] == 'h39 :
+                          GAME == KINGDMGP ? addr_8_plus == 'h100416 && cpu_dout[15:8] == 'h39 :
                           'h0;
 
 reg [1:0] hiscore_init = 2'b00;
@@ -283,15 +282,13 @@ always @(posedge CLK96 or posedge RESET96) begin
             //RAM
             pre_sel_ram <= addr_8[23:16] == 8'b0001_0000; // 0x100000 - 0x10FFFF
 
-            sel_hiscore <= GAME == GAREGGA && (addr_8_plus >='h10CA4D) && (addr_8_plus<'h10CA4D+'hEA) ? 1 : //length:234
-                           GAME == GAREGGA && (addr_8_plus=='h100030) ? 1 : //length: 1
-                           GAME == SSTRIKER && (addr_8_plus>='h10029a) && (addr_8_plus<'h10029a+'hA4) ? 1 : //length:164
-                           GAME == KINGDMGP && (addr_8_plus>='h1002D0) && (addr_8_plus<'h1002D0+'h9E) ? 1 : //length:158
-                           GAME == KINGDMGP && (addr_8_plus>='h1003C4) && (addr_8_plus<'h1003C4+'h53) ? 1 : //length:83
-                           0;
+            sel_hiscore <= GAME == GAREGGA && (addr_8 >='h10CA4C) && (addr_8 < 'h10CA4C+'hEC) || //length:236
+                           GAME == SSTRIKER && (addr_8>='h10029a) && (addr_8 <'h10029a+'hA4) || //length:164
+                           GAME == KINGDMGP && (addr_8>='h1002D0) && (addr_8<'h1002D0+'h9E) || //length:158
+                           GAME == KINGDMGP && (addr_8>='h1003C4) && (addr_8<'h1003C4+'h54); //length:84
             //hiscore hook
             if(!hiscore_init[0] && !hiscore_init_end_0 && last_hiscore_init_end_0) hiscore_init[0]<=1;
-            if(!hiscore_init[1] && !hiscore_init_end_1 && last_hiscore_init_end_1) hiscore_init[1]<=1;
+            if(GAME == GAREGGA || GAME == SSTRIKER || (!hiscore_init[1] && !hiscore_init_end_1 && last_hiscore_init_end_1)) hiscore_init[1]<=1;
             
             //Shared RAM
             pre_sel_sram <= addr_8[23:14] == 10'b0010_0001_10; //0x218000 - 0x21BFFF
@@ -369,7 +366,7 @@ always @(posedge CLK96, posedge RESET96) begin
         cpu_din <= sel_gp9001 && RW ? GP9001_DOUT : //gcu
                    sel_rom ? CPU_PRG_DATA : //cpu program
                    
-                   sel_hiscore && (&hiscore_init) ? {2{HISCORE_DOUT}} : //hiscore reads take precedence over ram.
+                   sel_hiscore && (&hiscore_init) ? HISCORE_DOUT : //hiscore reads take precedence over ram.
                    sel_ram && RW ? main_ram_q0 ://ram reads
                    sel_sram && RW ? main_sram_q0 ://ram reads
                    sel_palram && RW ? main_palram_q0 :
@@ -408,7 +405,7 @@ always @(posedge CLK96) begin
         OKI_BANK<=0;
     end else begin
         if(GAME == KINGDMGP && toaplan2_coinword_w_cs && !RW) begin
-            OKI_BANK <= cpu_dout[7:0];
+            OKI_BANK <= cpu_dout[4];
         end
         if(soundlatch_w) begin
             SOUNDLATCH <= cpu_dout[7:0];
@@ -535,7 +532,7 @@ fx68k u_011 (
     .DTACKn     (DTACKn),
     .IPL0n      (1'b1),
     .IPL1n      (1'b1),
-    .IPL2n      (VINT),
+    .IPL2n      (int1),
 
     // Unused
     .oRESETn    (),

@@ -200,7 +200,7 @@ wire [10:0] GP9001OUT;
 //z80
 wire [7:0] SOUNDLATCH;
 wire Z80INT, Z80WAIT;
-wire [7:0] OKI_BANK;
+wire OKI_BANK;
 
 //bus sharing
 wire BUSACK;
@@ -224,9 +224,9 @@ wire [8:0] V;
 //hiscore
 wire		 HISCORE_CS;
 wire   [1:0] HISCORE_WE;
-wire   [7:0] HISCORE_DIN;
-wire   [7:0] HISCORE_DOUT;
-wire   [7:0] HISCORE_ADDR;
+wire   [15:0] HISCORE_DIN;
+wire   [15:0] HISCORE_DOUT;
+wire   [6:0] HISCORE_ADDR;
 
 //vrams
 wire [13:0] TEXTROM_ADDR;
