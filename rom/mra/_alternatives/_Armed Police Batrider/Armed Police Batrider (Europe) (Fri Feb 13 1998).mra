@@ -76,5 +76,5 @@
         <dip name="Player Select" bits="22" ids="Off,On"/>
         <dip name="Special Course" bits="23" ids="Off,On"/>
     </switches>
-    <buttons names="Shot,Bomb,Formation,ABC,Start,Coin,Pause" default="Y,X,B,A,R,L,Start" count="4"/>
+    <buttons names="Shot,Bomb,Formation,Start,Coin,Pause" default="Y,X,B,R,L,Start" count="3"/>
 </misterromdescription>

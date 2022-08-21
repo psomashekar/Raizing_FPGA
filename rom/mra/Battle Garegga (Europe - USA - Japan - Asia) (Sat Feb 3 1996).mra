@@ -43,6 +43,16 @@
     <rom index="1">
         <part>01</part>
     </rom>
+    <!-- default hiscore -->
+    <rom index="2">
+        <part>
+        <!-- 0x10ca4d, 0xea bytes-->
+        0F 42 40 31 30 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 0D BB A0 20 39 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 0C 35 00 20 38 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 0A AE 60 20 37 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 09 27 C0 20 36 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 07 A1 20 20 35 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 06 1A 80 20 34 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 04 93 E0 20 33 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 03 0D 40 20 32 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A 00 00 00 00 02 00 01 86 A0 20 31 30 30 30 30 30 00 2A 2A 2A 00 00 00 2A
+        <!-- 0x100030, 0x1 bytes -->
+        72
+        </part>
+    </rom>
+    <nvram index="2" size="235"/>
     <switches page_id="1" page_name="Switches" base="8" default="00,00,00">
         <!-- DSWA -->
         <dip name="Test Mode" bits="0" ids="Off,On"/>
@@ -63,5 +73,5 @@
         <dip name="Allow Continue" bits="18" ids="Yes,No"/>
         <dip name="Stage Edit" bits="19" ids="Off,On"/>
     </switches>
-    <buttons names="Shot,Bomb,Formation,ABC,Start,Coin,Pause" default="Y,X,B,A,R,L,Start" count="4"/>
+    <buttons names="Shot,Bomb,Formation,Start,Coin,Pause" default="Y,X,B,R,L,Start" count="3"/>
 </misterromdescription>

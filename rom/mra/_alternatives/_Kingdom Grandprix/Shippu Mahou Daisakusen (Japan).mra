@@ -56,5 +56,5 @@
         <!-- SYS -->
         <dip name="Region" bits="16,19" ids="JPN,USA,EU,SEA,CHN,KOR,HK,TWN" values="0,2,4,6,8,10,12,14"/>
     </switches>
-    <buttons names="Shot,Bomb,Formation,ABC,Start,Coin,Pause" default="Y,X,B,A,R,L,Start" count="4"/>
+    <buttons names="Shot,Bomb,Formation,Start,Coin,Pause" default="Y,X,B,R,L,Start" count="3"/>
 </misterromdescription>

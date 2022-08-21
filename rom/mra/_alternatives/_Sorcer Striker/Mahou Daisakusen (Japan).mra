@@ -53,5 +53,5 @@
         <dip name="Game Mode" bits="14" ids="Normal,Invincible"/>
         <dip name="Continue Play" bits="15" ids="On,Off"/>
     </switches>
-    <buttons names="Shot,Bomb,Formation,ABC,Start,Coin,Pause" default="Y,X,B,A,R,L,Start" count="4"/>
+    <buttons names="Shot,Bomb,Formation,Start,Coin,Pause" default="Y,X,B,R,L,Start" count="3"/>
 </misterromdescription>

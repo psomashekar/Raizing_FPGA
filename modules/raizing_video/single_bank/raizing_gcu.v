@@ -221,10 +221,14 @@ assign TEXT_SCROLL_XOFFS = text_scroll_xoffs;
 assign TEXT_SCROLL_YOFFS = text_scroll_yoffs;
 
 //vint irq
-always @(cur_scr_reg_num, V, RESET) begin
-    if(V == 9'hE6 || cur_scr_reg_num == 8'h0F || cur_scr_reg_num == 8'h8F || cur_scr_reg_num == 8'h0e || RESET) begin
-        VINT <= 1'b0;
-    end else VINT <= 1'b1;
+always @(cur_scr_reg_num, V, RESET96) begin
+    if(RESET96) begin
+        VINT<=1'b1;
+    end else begin
+        if(V == 8'E6) VINT<=1'b0;
+        if(cur_scr_reg_num == 8'h0F || cur_scr_reg_num == 8'h8F || cur_scr_reg_num == 8'h0e) VINT<=1'b1;
+        else VINT<=1'b1;
+    end
 end
 
 reg INC_LAST_CYCLE = 1'b0;
