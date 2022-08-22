@@ -333,6 +333,7 @@ raizing_video u_video(
     .PIXEL_CEN(pxl_cen),
     .RESET(RESET),
     .RESET96(RESET96),
+    .SHIFT_SPRITE_PRI(GAME == SSTRIKER ? 1'b1 : 1'b0),
 
     //graphics ROM
     .GFX_CS(GFX_CS),
