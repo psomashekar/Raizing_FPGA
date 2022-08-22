@@ -156,12 +156,9 @@ reg sel_hiscore;
 wire [23:0] addr_8_plus = {A[23:1], UDSn && !LDSn}; //makes it easier for odd address boundaries
 assign HISCORE_CS = sel_hiscore;
 assign HISCORE_ADDR = GAME == GAREGGA && (addr_8 >='h10CA4C) && (addr_8<'h10CA4C+'hEC) ? (addr_8-'h10CA4C)>>1 : //length:236
-                      GAME == SSTRIKER && (addr_8>='h10029a) && (addr_8<'h10029a+'hA4) ? (addr_8-'h10029A)>>1 : //length:164
-                      GAME == KINGDMGP && (addr_8>='h1002D0) && (addr_8<'h1002D0+'h9E) ? (addr_8-'h1002D0)>>1 : //length:158
-                      GAME == KINGDMGP && (addr_8>='h1003C4) && (addr_8<'h1003C4+'h54) ? ((addr_8-'h1003C4)+'h9E)>>1 : //length:84
                       'hx;
 assign HISCORE_DIN = cpu_dout;
-assign HISCORE_WE = {sel_hiscore && !RW && !UDSn, sel_hiscore && !RW && !LDSn} & {2{&hiscore_init}};
+assign HISCORE_WE = {sel_hiscore && !RW && !UDSn, sel_hiscore && !RW && !LDSn} & {2{hiscore_init}};
 
 //the first 19 bits are used to address other devices (ie. ROM/RAM). The rest are used for selects.
 assign ADDR[19:1] = A[19:1];
@@ -236,17 +233,10 @@ reg gp9001_vdp_device_r_cs, gp9001_vdp_device_w_cs, read_port_in1_r_cs, read_por
 `endif
 
 wire hiscore_init_end_0 = GAME == GAREGGA ? addr_8_plus=='h10CB36 && cpu_dout[15:8] == 'h2A :
-                          GAME == SSTRIKER ? addr_8_plus=='h10033D && cpu_dout[7:0] == 'h20 :
-                          GAME == KINGDMGP ? addr_8_plus=='h10036D && cpu_dout[7:0] == 'h4E :
-                          'h0;
-wire hiscore_init_end_1 = GAME == GAREGGA ? 1 :
-                          GAME == SSTRIKER ? 1 :
-                          GAME == KINGDMGP ? addr_8_plus == 'h100416 && cpu_dout[15:8] == 'h39 :
                           'h0;
 
-reg [1:0] hiscore_init = 2'b00;
+reg hiscore_init = 0;
 reg last_hiscore_init_end_0 = 0;
-reg last_hiscore_init_end_1 = 0;
 
 always @(posedge CLK96 or posedge RESET96) begin
     if(RESET96) begin
@@ -263,12 +253,10 @@ always @(posedge CLK96 or posedge RESET96) begin
         CPU_PRG_ADDR<=19'd0;
         sel_z80<=1'b0;
         last_hiscore_init_end_0 <= 0;
-        last_hiscore_init_end_1 <= 0;
     end else begin
         
         if(!ASn && BGACKn) begin
             last_hiscore_init_end_0<=hiscore_init_end_0;
-            last_hiscore_init_end_1<=hiscore_init_end_1;
             //debugging 
             // $display("time: %t, addr: %h, uds: %h, lds: %h, rw: %h, cpu_dout: %h, cpu_din: %h, sel_status: %b\n", $time/1000, addr_8, UDSn, LDSn, RW, cpu_dout, cpu_din, {sel_rom, sel_ram, sel_sram, sel_z80, sel_gp9001, sel_io});
              if(debug) 
@@ -282,13 +270,9 @@ always @(posedge CLK96 or posedge RESET96) begin
             //RAM
             pre_sel_ram <= addr_8[23:16] == 8'b0001_0000; // 0x100000 - 0x10FFFF
 
-            sel_hiscore <= GAME == GAREGGA && (addr_8 >='h10CA4C) && (addr_8 < 'h10CA4C+'hEC) || //length:236
-                           GAME == SSTRIKER && (addr_8>='h10029a) && (addr_8 <'h10029a+'hA4) || //length:164
-                           GAME == KINGDMGP && (addr_8>='h1002D0) && (addr_8<'h1002D0+'h9E) || //length:158
-                           GAME == KINGDMGP && (addr_8>='h1003C4) && (addr_8<'h1003C4+'h54); //length:84
+            sel_hiscore <= GAME == GAREGGA && (addr_8 >='h10CA4C) && (addr_8 < 'h10CA4C+'hEC);
             //hiscore hook
-            if(!hiscore_init[0] && !hiscore_init_end_0 && last_hiscore_init_end_0) hiscore_init[0]<=1;
-            if(GAME == GAREGGA || GAME == SSTRIKER || (!hiscore_init[1] && !hiscore_init_end_1 && last_hiscore_init_end_1)) hiscore_init[1]<=1;
+            if(!hiscore_init && !hiscore_init_end_0 && last_hiscore_init_end_0) hiscore_init<=1;
             
             //Shared RAM
             pre_sel_sram <= addr_8[23:14] == 10'b0010_0001_10; //0x218000 - 0x21BFFF
@@ -366,7 +350,7 @@ always @(posedge CLK96, posedge RESET96) begin
         cpu_din <= sel_gp9001 && RW ? GP9001_DOUT : //gcu
                    sel_rom ? CPU_PRG_DATA : //cpu program
                    
-                   sel_hiscore && (&hiscore_init) ? HISCORE_DOUT : //hiscore reads take precedence over ram.
+                   sel_hiscore && hiscore_init ? HISCORE_DOUT : //hiscore reads take precedence over ram.
                    sel_ram && RW ? main_ram_q0 ://ram reads
                    sel_sram && RW ? main_sram_q0 ://ram reads
                    sel_palram && RW ? main_palram_q0 :
