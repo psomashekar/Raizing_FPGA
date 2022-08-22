@@ -200,7 +200,7 @@ wire [10:0] GP9001OUT;
 //z80
 wire [7:0] SOUNDLATCH;
 wire Z80INT, Z80WAIT;
-wire [7:0] OKI_BANK;
+wire OKI_BANK;
 
 //bus sharing
 wire BUSACK;
@@ -220,6 +220,13 @@ assign { DIPSW_C, DIPSW_B, DIPSW_A } = DIPSW[23:0];
 wire HSYNC, VSYNC, FBLANK;
 wire LHBLL, LVBLL;
 wire [8:0] V;
+
+//hiscore
+wire		 HISCORE_CS;
+wire   [1:0] HISCORE_WE;
+wire   [15:0] HISCORE_DIN;
+wire   [15:0] HISCORE_DOUT;
+wire   [6:0] HISCORE_ADDR;
 
 //vrams
 wire [13:0] TEXTROM_ADDR;
@@ -310,7 +317,14 @@ garegga_cpu u_cpu (
     .TEXTSCROLL_ADDR(TEXTSCROLL_ADDR),
     .TEXTSCROLL_DATA(TEXTSCROLL_DATA),
 
-    .GAME(GAME)
+    .GAME(GAME),
+
+    //hiscore interface
+    .HISCORE_CS(HISCORE_CS),
+	.HISCORE_WE(HISCORE_WE),
+	.HISCORE_DIN(HISCORE_DIN),
+	.HISCORE_DOUT(HISCORE_DOUT),
+	.HISCORE_ADDR(HISCORE_ADDR) 
 );
 
 raizing_video u_video(
@@ -514,7 +528,14 @@ garegga_sdram u_sdram (
     .TEXTROM_ADDR(TEXTROM_ADDR),
     .TEXTROM_DOUT(TEXTROM_DATA),
 
-    .GAME(GAME)
+    .GAME(GAME),
+
+    //hiscore interface
+    .HISCORE_CS(HISCORE_CS),
+	.HISCORE_WE(HISCORE_WE),
+	.HISCORE_DIN(HISCORE_DIN),
+	.HISCORE_DOUT(HISCORE_DOUT),
+	.HISCORE_ADDR(HISCORE_ADDR)
 );
 
 endmodule

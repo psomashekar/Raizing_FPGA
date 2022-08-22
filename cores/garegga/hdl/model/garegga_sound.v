@@ -51,7 +51,7 @@ module garegga_sound (
     output         [7:0] SRAM_DIN,
     output               SRAM_WE,
 
-    input          [7:0] OKI_BANK,
+    input                OKI_BANK,
     input          [7:0] GAME,
     input          [1:0] FX_LEVEL,
     input		 DIP_PAUSE
@@ -222,7 +222,7 @@ always @(posedge CLK96) begin
     end
 end
 wire [20:0] nmk_pcm_addr;
-assign PCM_ADDR = GAME == KINGDMGP ? (OKI_BANK[4] << 14) + (oki0_pcm_addr & 'h3FFFF) : 
+assign PCM_ADDR = GAME == KINGDMGP ? (OKI_BANK * 'h40000) + (oki0_pcm_addr & 'h3FFFF) : 
                   GAME == SSTRIKER ? (oki0_pcm_addr & 'h3FFFF) :
                   nmk_pcm_addr;
 
