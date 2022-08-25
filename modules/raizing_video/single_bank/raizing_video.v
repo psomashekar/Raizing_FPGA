@@ -37,6 +37,7 @@ module raizing_video (
     input  [15:0] TEXTSELECT_DATA,
     output  [7:0] TEXTSCROLL_ADDR,
     input  [15:0] TEXTSCROLL_DATA,
+    input         SHIFT_SPRITE_PRI,
 
     //graphics ROM
     output   GFX_CS,
@@ -266,6 +267,7 @@ raizing_obj u_obj(
     .HB(HB),
     .VB(VB),
     .FLIPX(FLIP),
+    .SHIFT_SPRITE_PRI(SHIFT_SPRITE_PRI),
 
     //interface with GP9001 RAM Mirror
     .GP9001RAM_GCU_ADDR(GP9001RAM_GCU_ADDR),

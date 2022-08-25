@@ -604,20 +604,20 @@ always @(posedge CLK96, posedge RESET96) begin
                         if(tile_x_pos <= -16 || tile_x_pos >=320) begin
                             if(tile_x_pos > -tx && tile_x_pos < (320-tx)) begin
                                 // $display("line: %d, priority: %d, x:%d", VRENDER, priority_i, (sprite_x_pos+tx)&'h1FF);
-                                BUF_ADDR<=(FLIPX ? 320-(tile_x_pos+tx) : (tile_x_pos+tx))&'h1FF;
+                                BUF_ADDR<=(FLIPX ? 319-(tile_x_pos+tx) : (tile_x_pos+tx))&'h1FF;
                                 BUF_DATA<=(priority_i[3:0] << 12) + tile_palette + tile_code;
                             end
                         end else if((tile_x_pos > -16 && tile_x_pos <320)) begin
                             // $display("%h, %d, %d, %h, %h, %h", sprite_num, VRENDER, buf_code, palette, sprite_code, palette+sprite_code);
                             // $display("line: %d, priority: %d, x:%d", VRENDER, priority_i, buf_code&'h1FF);
-                            BUF_ADDR<=(FLIPX ? 320-buf_code : buf_code)&'h1FF;
+                            BUF_ADDR<=(FLIPX ? 319-buf_code : buf_code)&'h1FF;
                             BUF_DATA<=(priority_i[3:0] << 12) + tile_palette + tile_code;
                         end else begin //sprite is out of bounds
-                            BUF_ADDR<=(FLIPX ? 320-buf_code : buf_code)&'h1ff;
+                            BUF_ADDR<=(FLIPX ? 319-buf_code : buf_code)&'h1ff;
                             BUF_DATA<=0;                      
                         end
                     end else begin
-                        BUF_ADDR<=(FLIPX ? 320-buf_code : buf_code)&'h1ff;
+                        BUF_ADDR<=(FLIPX ? 319-buf_code : buf_code)&'h1ff;
                         BUF_DATA<=0;
                     end
 

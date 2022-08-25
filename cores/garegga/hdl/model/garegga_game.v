@@ -113,6 +113,8 @@ wire FLIP = GAME==GAREGGA ? dipsw[10] : //dipswitch bit 10 in DSWB
             GAME==SSTRIKER || GAME==KINGDMGP ? dipsw[1] : //dipswitch 1
             0;
 // assign game_led = downloading ? 1'b0 : 1'b1;
+//GAME selector
+wire [7:0] GAME;
 
 /*CLOCKS*/
 wire CEN675, CEN675B, CEN4, CEN2, CEN2B, CEN4B, CEN1350, CEN1350B;
@@ -134,15 +136,14 @@ garegga_clock u_clocken (
     .CEN1p6875(CEN1p6875),
     .CEN1p6875B(CEN1p6875B),
     .CEN1350(CEN1350),
-    .CEN1350B(CEN1350B)
+    .CEN1350B(CEN1350B),
+    .GAME(GAME)
 );
 
 assign pxl_cen = CEN675;
 assign pxl2_cen = CEN1350;
 
 /*MEMORY CONNECTS*/
-//GAME selector
-wire [7:0] GAME;
 //68K ROM
 wire ROM68K_CS;
 wire ROM68K_OK;
@@ -333,6 +334,7 @@ raizing_video u_video(
     .PIXEL_CEN(pxl_cen),
     .RESET(RESET),
     .RESET96(RESET96),
+    .SHIFT_SPRITE_PRI(GAME == SSTRIKER ? 1'b1 : 1'b0),
 
     //graphics ROM
     .GFX_CS(GFX_CS),
@@ -400,27 +402,18 @@ raizing_video u_video(
     .FLIP(FLIP)
 );
 
-wire ym2151_cen, ym2151_cen2, oki_cen, z80_cen;
-assign ym2151_cen = GAME == KINGDMGP ? CEN3p375 :
-                    GAME == SSTRIKER ? CEN3p375 :
-                    CEN4;
-assign ym2151_cen2 = GAME == KINGDMGP ? CEN1p6875 :
-                     GAME == SSTRIKER ? CEN1p6875 :
-                     CEN2;
-assign oki_cen = GAME == KINGDMGP ? CEN1 :
-                 GAME == SSTRIKER ? CEN1 :
-                 CEN2;
-assign z80_cen = CEN4;
-
 garegga_sound u_sound(
     .CLK(CLK),
     .CLK96(CLK96),
     .RESET(RESET),
     .RESET96(RESET96),
-    .YM2151_CEN(ym2151_cen),
-    .YM2151_CEN2(ym2151_cen2),
-    .Z80_CEN(z80_cen),
-    .OKI_CEN(oki_cen),
+    .YM2151_CEN(CEN4),
+    .YM2151_CEN2(CEN2),
+    .OKI_CEN(CEN2),
+    .YM2151_CEN_1(CEN3p375),
+    .YM2151_CEN2_1(CEN1p6875),
+    .OKI_CEN_1(CEN1),
+    .Z80_CEN(CEN4),
     .ROMZ80_CS(ROMZ80_CS),
 	.ROMZ80_OK(ROMZ80_OK),
 	.ROMZ80_ADDR(ROMZ80_ADDR),

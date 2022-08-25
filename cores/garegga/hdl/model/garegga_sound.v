@@ -26,8 +26,11 @@ module garegga_sound (
     input                RESET96,
     input                YM2151_CEN,
     input                YM2151_CEN2,
+    input                YM2151_CEN_1,
+    input                YM2151_CEN2_1,
     input                Z80_CEN,
     input                OKI_CEN,
+    input                OKI_CEN_1,
     
     output reg           ROMZ80_CS,
 	input                ROMZ80_OK,
@@ -66,22 +69,24 @@ wire m1_n, iorq_n, mreq_n;
 wire rd_n;
 wire wr_n, WRn;
 wire [15:0] A;
-reg [7:0] din, fm_din, oki0_din;
+reg [7:0] din, fm_din, oki0_din, oki1_din;
 wire io_cs = !iorq_n;
 reg [3:0] bank = 2; // init bank to 2
-wire [7:0] ram_dout, dout, fm_dout, oki0_dout;
+wire [7:0] ram_dout, dout, fm0_dout, oki0_dout, fm1_dout, oki1_dout;
 assign WRn = wr_n | mreq_n;
-wire signed [15:0] fm_left, fm_right;
+wire signed [15:0] fm0_left, fm0_right, fm1_left, fm1_right;
 wire peak_l, peak_r;
+wire sample_0, sample_1;
+assign sample = GAME == GAREGGA ? sample_0 : sample_1;
 
-wire signed [13:0] oki0_pre;
-wire oki0_sample;
+wire signed [13:0] oki0_pre, oki1_pre;
+wire oki0_sample, oki1_sample;
 
 reg [7:0] nmk112_data_0a;
 reg [2:0] nmk112_offset_0a;
 wire [20:0] nmk112_bank_addr_0a;
 wire [20:0] start0a;
-wire [17:0] oki0_pcm_addr;
+wire [17:0] oki0_pcm_addr, oki1_pcm_addr;
 
 //debugging 
  wire debug = 1'b1;
@@ -97,7 +102,7 @@ fmgain = GAME == GAREGGA ? 8'h08 :
 pcmgain = GAME == GAREGGA ? 8'h10 : 
           GAME == SSTRIKER ? 8'h10 :
           8'h10;
-always @(posedge CLK) begin
+always @(posedge CLK96) begin
     peak <= peak_l | peak_r;
 end
 
@@ -105,8 +110,8 @@ reg [7:0] gain1;
 reg signed [15:0] final_left;
 reg signed [13:0] final_oki0;
 always @(posedge CLK96) begin
-    final_left<=fm_left;
-    final_oki0<=oki0_pre;
+    final_left<=GAME==GAREGGA ? fm0_left : fm1_left;
+    final_oki0<=GAME==GAREGGA ? oki0_pre : oki1_pre;
     gain1<=pcmgain + (FX_LEVEL<<1);
 end
 
@@ -115,7 +120,7 @@ assign peak_r = peak_l;
 jtframe_mixer #(.W0(16), .W1(14), .WOUT(16)) u_mix_left(
     .rst    ( RESET96       ),
     .clk    ( CLK96       ),
-    .cen    ( 1'b1      ),
+    .cen    ( 1'b1),
     // input signals
     .ch0    ( final_left   ),
     .ch1    ( final_oki0 ),
@@ -197,8 +202,8 @@ always @(posedge CLK96) begin
             ROMZ80_CS: din <= ROMZ80_DOUT;
             (ram_cs && !rd_n): din <= SRAM_DATA;
             soundlatch_rd: din <= SOUNDLATCH;
-            ymsnd_rd: din <= fm_dout;
-            okim6295_device_0_rd: din <= oki0_dout;
+            ymsnd_rd: din <= GAME == GAREGGA ? fm0_dout : fm1_dout;
+            okim6295_device_0_rd: din <= GAME == GAREGGA ? oki0_dout : oki1_dout;
             e01d_rd : din<=0;
             default: din <= 8'hFF;
         endcase
@@ -209,6 +214,7 @@ always @(posedge CLK96) begin
 
         else if(okim6295_device_0_wr) begin
             oki0_din <= dout;
+            oki1_din <= dout;
         end
 
         if(raizing_oki_bankswitch_w) begin
@@ -222,8 +228,8 @@ always @(posedge CLK96) begin
     end
 end
 wire [20:0] nmk_pcm_addr;
-assign PCM_ADDR = GAME == KINGDMGP ? (OKI_BANK * 'h40000) + (oki0_pcm_addr & 'h3FFFF) : 
-                  GAME == SSTRIKER ? (oki0_pcm_addr & 'h3FFFF) :
+assign PCM_ADDR = GAME == KINGDMGP ? (OKI_BANK * 'h40000) + (oki1_pcm_addr & 'h3FFFF) : 
+                  GAME == SSTRIKER ? (oki1_pcm_addr & 'h3FFFF) :
                   nmk_pcm_addr;
 
 
@@ -263,9 +269,9 @@ jtframe_ff u_m68wait_ff(
 jtframe_z80_romwait u_cpu(
     .rst_n      ( ~RESET96      ),
     .clk        ( CLK96         ),
-    .cen        ( Z80_CEN     ), //4
+    .cen        ( GAME == GAREGGA ? Z80_CEN : YM2151_CEN_1     ), //4
     .cpu_cen    ( cpu_cen     ),
-    .int_n      ( int_n       ),
+    .int_n      ( GAME == GAREGGA ? int_n : ym_irq_n       ),
     .nmi_n      ( nmi_n       ),
     .busrq_n    ( 1'b1        ),
     .m1_n       ( m1_n        ),
@@ -288,6 +294,7 @@ jtframe_z80_romwait u_cpu(
 
 assign PCM_CS = 1'b1;
 
+//for garegga
 jt6295 #(.INTERPOL(1)) u_adpcm_0(
     .rst        ( RESET96       ),
     .clk        ( CLK96       ),
@@ -306,7 +313,7 @@ jt6295 #(.INTERPOL(1)) u_adpcm_0(
     .sample     ( oki0_sample)   // ~26kHz
 );
 
-jt51 u_jt51(
+jt51 u_jt51_0(
     .rst        ( RESET96       ), // reset
     .clk        ( CLK96       ), // main clock
     .cen        ( YM2151_CEN & DIP_PAUSE    ), // 4mhz
@@ -315,20 +322,64 @@ jt51 u_jt51(
     .wr_n       ( wr_n      ), // write
     .a0         ( A[0]     ),
     .din        ( dout    ), // data in
-    .dout       ( fm_dout   ), // data out
+    .dout       ( fm0_dout   ), // data out
     .ct1        (           ),
     .ct2        (           ),
-    .irq_n      ( ym_irq_n     ),  // I do not synchronize this signal
+    .irq_n      (      ),  // I do not synchronize this signal
     // Low resolution output (same as real chip)
-    .sample     ( sample    ), // marks new output sample
+    .sample     ( sample_0    ), // marks new output sample
     .left       (           ),
     .right      (           ),
     // Full resolution output
-    .xleft      ( fm_left   ),
+    .xleft      ( fm0_left   ),
     .xright     (   ),
     // unsigned outputs for sigma delta converters, full resolution
     .dacleft    (           ),
     .dacright   (           )
+);
+
+//for sorcer & kingdom
+jt51 u_jt51_1(
+    .rst        ( RESET96       ), // reset
+    .clk        ( CLK96       ), // main clock
+    .cen        ( YM2151_CEN_1 & DIP_PAUSE    ), // 4mhz
+    .cen_p1     ( YM2151_CEN2_1 & DIP_PAUSE   ), //2mhz, half clock
+    .cs_n       ( !fm_cs    ), // chip select
+    .wr_n       ( wr_n      ), // write
+    .a0         ( A[0]     ),
+    .din        ( dout    ), // data in
+    .dout       ( fm1_dout   ), // data out
+    .ct1        (           ),
+    .ct2        (           ),
+    .irq_n      ( ym_irq_n     ),  // I do not synchronize this signal
+    // Low resolution output (same as real chip)
+    .sample     ( sample_1    ), // marks new output sample
+    .left       (           ),
+    .right      (           ),
+    // Full resolution output
+    .xleft      ( fm1_left   ),
+    .xright     (   ),
+    // unsigned outputs for sigma delta converters, full resolution
+    .dacleft    (           ),
+    .dacright   (           )
+);
+
+jt6295 #(.INTERPOL(1)) u_adpcm_1(
+    .rst        ( RESET96       ),
+    .clk        ( CLK96       ),
+    .cen        ( OKI_CEN_1 & DIP_PAUSE ),
+    .ss         ( 1'b1      ),
+    // CPU interface
+    .wrn        ( ~okim6295_device_0_wr ),  // active low
+    .din        ( oki1_din      ),
+    .dout       ( oki1_dout  ),
+    // ROM interface
+    .rom_addr   ( oki1_pcm_addr ),
+    .rom_data   ( PCM_DOUT),
+    .rom_ok     ( PCM_OK  ),
+    // Sound output
+    .sound      ( oki1_pre   ),
+    .sample     ( oki1_sample)   // ~26kHz
 );
 
 endmodule

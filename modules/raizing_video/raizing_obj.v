@@ -31,6 +31,7 @@ module raizing_obj (
     input HB,
     input VB,
     input FLIPX,
+    input SHIFT_SPRITE_PRI,
 
     //interface with GP9001 RAM Mirror
     output reg [12:0] GP9001RAM_GCU_ADDR,
@@ -546,8 +547,8 @@ always @(posedge CLK96, posedge RESET96) begin
                     
                     if( sprite_code > 0 && buf_code>=0 && buf_code<320) begin //if the sprite is not blank
                         drawn_pixels[tx] = 1'b1;
-                        buf_addr<=(FLIPX ? 320-buf_code : buf_code)&'h1FF;
-                        buf_data<=(sprite_attributes[59:56] << 12) + (palette&'h7F0)+sprite_code;
+                        buf_addr<=(FLIPX ? 319-buf_code : buf_code)&'h1FF;
+                        buf_data<=((SHIFT_SPRITE_PRI ? sprite_attributes[59:56] + 1 : sprite_attributes[59:56]) << 12) + (palette&'h7F0)+sprite_code;
                     end else begin //it is a blank sprite
                         //do nothing, because other layers of sprites might be on top.
                     end
