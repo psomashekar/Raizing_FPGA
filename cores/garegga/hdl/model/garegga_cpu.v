@@ -391,7 +391,7 @@ always @(posedge CLK96) begin
         if(GAME == KINGDMGP && toaplan2_coinword_w_cs && !RW) begin
             OKI_BANK <= cpu_dout[4];
         end
-        if(soundlatch_w) begin
+        if(GAME == GAREGGA && soundlatch_w) begin
             SOUNDLATCH <= cpu_dout[7:0];
             Z80INT<=1'b1;
         end
@@ -452,7 +452,7 @@ jtframe_virq u_virq(
 );
 
 //68k cpu running at 16mhz
-jtframe_68kdtack u_dtack(
+jtframe_68kdtack #(.W(10)) u_dtack(
     .rst        (RESET96),
     .clk        (CLK96),
     .cpu_cen    (CEN16),
@@ -465,6 +465,8 @@ jtframe_68kdtack u_dtack(
     .num        (4'd1),
     .den        (5'd6),
     .DTACKn     (DTACKn),
+    .wait2      (0),
+    .wait3      (0),
     // unused
     .fave       (),
     .fworst     (),

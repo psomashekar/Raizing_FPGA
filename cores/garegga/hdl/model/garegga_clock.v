@@ -22,22 +22,25 @@
 module garegga_clock (
     input CLK, //48mhz
     input CLK96,
-    output CEN675,
+    output reg CEN675,
     output CEN675B,
     output CEN4,
     output CEN4B,
     output CEN2,
     output CEN2B,
-    output CEN3p375,
+    output reg CEN3p375,
     output CEN3p375B,
     output CEN1,
     output CENp7575,
     output CEN1B,
-    output CEN1p6875,
+    output reg CEN1p6875,
     output CEN1p6875B,
     output reg CEN1350,
-    output CEN1350B
+    output CEN1350B,
+    input [7:0] GAME
 );
+
+localparam GAREGGA = 'h0, KINGDMGP = 'h2, SSTRIKER = 'h1;
 
 // //6.75mhz for GP9001
 // //96*(9/128) == 6.75
@@ -47,14 +50,12 @@ reg	[31:0]	counter;
 always @(posedge CLK96)
 	{ CEN1350, counter } <= counter + 32'd603979776;
 
-jtframe_cendiv u_cen_675 (
-    .clk(CLK96),
-    .cen_in(CEN1350),
-    .cen_da(CEN675)
-);
+reg [31:0] counter2;
+always @(posedge CLK96)
+    {CEN675, counter2} <= counter2 + 32'd301989888;
 
 //4mhz for Z80
-//96*(1/24) == 4
+//48*(1/12) == 4
 jtframe_frac_cen u_frac_cen_4(
     .clk(CLK96),
     .n(1),
@@ -64,7 +65,7 @@ jtframe_frac_cen u_frac_cen_4(
 );
 
 //2mhz for OKI
-//96*(1/48) == 2
+//48*(1/24) == 2
 jtframe_frac_cen u_frac_cen_2(
     .clk(CLK96),
     .n(1),
@@ -74,29 +75,16 @@ jtframe_frac_cen u_frac_cen_2(
 );
 
 //kingdmgp ym2151 3.375mhz
-jtframe_cendiv u_cen_3375 (
-    .clk(CLK96),
-    .cen_in(CEN675),
-    .cen_da(CEN3p375)
-);
 
-jtframe_cendiv u_cen_16875 (
-    .clk(CLK96),
-    .cen_in(CEN3p375),
-    .cen_da(CEN1p6875)
-);
+reg [31:0] counter3;
+always @(posedge CLK96)
+    {CEN3p375, counter3} <= counter3 + 32'd150994944;
 
-//mahoudai oki .00757575mhz
-//shippumd oki 1
-jtframe_frac_cen #(.WC(16)) u_frac_cen_p7575(
-    .clk(CLK96),
-    .n(1),
-    .m(12672),
-    .cen(CENp7575),
-    .cenb(CEN1B)
-);
+reg [31:0] counter4;
+always @(posedge CLK96)
+    {CEN1p6875, counter4} <= counter4 + 32'd75497472;
 
-jtframe_frac_cen #(.WC(16)) u_frac_cen_1(
+jtframe_frac_cen u_frac_cen_1(
     .clk(CLK96),
     .n(1),
     .m(96),
