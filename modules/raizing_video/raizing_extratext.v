@@ -193,10 +193,10 @@ always @(posedge CLK96, posedge RESET96) begin
                         tx<=tx+1;
                         if(buf_code >= 0 && buf_code < 320) begin
                             if((((tile_data >> ((7-tx)*4)) & 8'h0F)) > 0) begin
-                                    buf_addr<=FLIPX ? 320-buf_code : buf_code; //start 1st pixel in this tile.
+                                    buf_addr<=FLIPX ? 319-buf_code : buf_code; //start 1st pixel in this tile.
                                     buf_data<=tile_palette_pointer+(((tile_data >> ((7-tx)*4)) & 8'h0F));
                             end else begin
-                                buf_addr<=FLIPX ? 320-buf_code : buf_code;
+                                buf_addr<=FLIPX ? 319-buf_code : buf_code;
                                 buf_data<=0;
                             end
                         end

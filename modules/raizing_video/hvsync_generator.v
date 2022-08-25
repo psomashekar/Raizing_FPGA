@@ -47,7 +47,7 @@ module hvsync_generator(clk, clk96, pxl_cen, reset, reset96, hsync, vsync, displ
   output [8:0] vs_end;
 
   wire [8:0] vrender_o;
-  assign vrender = flip ? 240-vrender_o : vrender_o;
+  assign vrender = flip ? 239-vrender_o : vrender_o;
 
 
 jtframe_vtimer #(
