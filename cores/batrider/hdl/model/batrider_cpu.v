@@ -445,7 +445,7 @@ jtframe_virq u_virq(
 //address bits 19 to 23 go to the E68DEC1B chip.
 
 //68k cpu running at 16mhz
-jtframe_68kdtack u_dtack(
+jtframe_68kdtack #(.W(10)) u_dtack(
     .rst        (RESET96),
     .clk        (CLK96),
     .cpu_cen    (CEN16),
@@ -458,6 +458,8 @@ jtframe_68kdtack u_dtack(
     .num        (4'd1),
     .den        (5'd6),
     .DTACKn     (DTACKn),
+    .wait2      (0),
+    .wait3      (0),
     // unused
     .fave       (),
     .fworst     (),
