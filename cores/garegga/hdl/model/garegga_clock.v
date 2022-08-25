@@ -29,7 +29,7 @@ module garegga_clock (
     output CEN2,
     output CEN2B,
     output reg CEN3p375,
-    output CEN3p375B,
+    output reg CEN3p375B,
     output CEN1,
     output CENp7575,
     output CEN1B,
@@ -75,10 +75,14 @@ jtframe_frac_cen u_frac_cen_2(
 );
 
 //kingdmgp ym2151 3.375mhz
-
 reg [31:0] counter3;
 always @(posedge CLK96)
     {CEN3p375, counter3} <= counter3 + 32'd150994944;
+
+//3.750
+reg [31:0] counter5;
+always @(posedge CLK96)
+    {CEN3p375B, counter5} <= counter5 + 32'd159383552;
 
 reg [31:0] counter4;
 always @(posedge CLK96)
