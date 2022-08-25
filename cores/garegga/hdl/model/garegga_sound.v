@@ -265,32 +265,101 @@ jtframe_ff u_m68wait_ff(
     .clr      ( soundlatch_ack ),    // active high
     .sigedge  ( Z80INT     ) // signal whose edge will trigger the FF
 );
+reg z80int_n;
+always @(*) begin
+    if(GAME == GAREGGA) z80int_n=int_n;
+    else z80int_n=ym_irq_n;
+end
 
-jtframe_z80_romwait u_cpu(
-    .rst_n      ( ~RESET96      ),
-    .clk        ( CLK96         ),
-    .cen        ( GAME == GAREGGA ? Z80_CEN : YM2151_CEN_1     ), //4
-    .cpu_cen    ( cpu_cen     ),
-    .int_n      ( GAME == GAREGGA ? int_n : ym_irq_n       ),
-    .nmi_n      ( nmi_n       ),
-    .busrq_n    ( 1'b1        ),
-    .m1_n       ( m1_n        ),
-    .mreq_n     ( mreq_n      ),
-    .iorq_n     ( iorq_n      ),
-    .rd_n       ( rd_n        ),
-    .wr_n       ( wr_n        ),
-    .rfsh_n     (             ),
-    .halt_n     (             ),
-    .busak_n    (             ),
-    .A          ( A           ),
-    .din    ( din         ),
-    .dout   ( dout        ),
-    // .ram_dout   ( ram_dout    ),
-    // .ram_cs     ( ram_cs      ),
+//wait_n generation
+wire busak_n, wait_n;
+reg [2-1:0] ss_wsh;
+reg [1-1:0] kgp_wsh;
+reg m1n_l;
+always @(posedge CLK96, posedge RESET96 ) begin
+    if( RESET96 ) begin
+        ss_wsh <= 0;
+        kgp_wsh <= 0;
+    end else if(Z80_CEN) begin
+        m1n_l <= m1_n;
+        case(GAME)
+            SSTRIKER: begin
+                if( !m1_n && m1n_l) ss_wsh <= {2{1'b1}};
+                else ss_wsh <= ss_wsh>>1;
+            end
+            KINGDMGP: begin
+                if (!m1_n && m1n_l) kgp_wsh <= {1{1'b1}};
+                else kgp_wsh <= kgp_wsh>>1;
+            end
+        endcase
+    end
+end
+assign wait_n = GAME == KINGDMGP ? ~kgp_wsh[0] : 
+                GAME == SSTRIKER ? ~ss_wsh[0] :
+                1;
+
+jtframe_z80wait #(1) u_wait(
+    .rst_n      ( ~RESET96     ),
+    .clk        ( CLK96       ),
+    .cen_in     ( Z80_CEN       ),
+    .cen_out    ( cpu_cen   ),
+    .gate       (           ),
+    .iorq_n     ( iorq_n    ),
+    .mreq_n     ( mreq_n    ),
+    .busak_n    ( busak_n   ),
+    // manage access to shared memory
+    .dev_busy   ( 1'b0      ),
     // manage access to ROM data from SDRAM
-    .rom_cs     ( ROMZ80_CS   ),
-    .rom_ok     ( ROMZ80_OK   )
-); 
+    .rom_cs     ( ROMZ80_CS    ),
+    .rom_ok     ( ROMZ80_OK    )
+);
+
+jtframe_z80 u_cpu(
+    .rst_n    ( ~RESET96     ),
+    .clk      ( CLK96       ),
+    .cen      ( cpu_cen   ),
+    .wait_n   ( wait_n    ),
+    .int_n    ( z80int_n  ),
+    .nmi_n    ( nmi_n     ),
+    .busrq_n  ( 1'b1   ),
+    .m1_n     ( m1_n      ),
+    .mreq_n   ( mreq_n    ),
+    .iorq_n   ( iorq_n    ),
+    .rd_n     ( rd_n      ),
+    .wr_n     ( wr_n      ),
+    .rfsh_n   (     ),
+    .halt_n   (     ),
+    .busak_n  (    ),
+    .A        ( A         ),
+    .din      ( din       ),
+    .dout     ( dout      )
+);
+
+// jtframe_z80_romwait #(.M1_WAIT(1)) u_cpu(
+//     .rst_n      ( ~RESET96      ),
+//     .clk        ( CLK96         ),
+//     .cen        ( Z80_CEN     ), //4
+//     .cpu_cen    ( cpu_cen     ),
+//     .int_n      ( z80int_n      ),
+//     .nmi_n      ( nmi_n       ),
+//     .busrq_n    ( 1'b1        ),
+//     .m1_n       ( m1_n        ),
+//     .mreq_n     ( mreq_n      ),
+//     .iorq_n     ( iorq_n      ),
+//     .rd_n       ( rd_n        ),
+//     .wr_n       ( wr_n        ),
+//     .rfsh_n     (             ),
+//     .halt_n     (             ),
+//     .busak_n    (             ),
+//     .A          ( A           ),
+//     .din    ( din         ),
+//     .dout   ( dout        ),
+//     // .ram_dout   ( ram_dout    ),
+//     // .ram_cs     ( ram_cs      ),
+//     // manage access to ROM data from SDRAM
+//     .rom_cs     ( ROMZ80_CS   ),
+//     .rom_ok     ( ROMZ80_OK   )
+// ); 
 
 assign PCM_CS = 1'b1;
 
