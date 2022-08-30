@@ -32,30 +32,18 @@ module bakraid_clock (
     output CEN16p9344B
 );
 
-// //6.75mhz for GP9001
-// //96*(9/128) == 6.75
-jtframe_frac_cen u_frac_cen_675(
-    .clk(CLK96),
-    .n(10'd9),
-    .m(10'd128),
-    .cen(CEN675),
-    .cenb(CEN675B)
-);
-
-jtframe_frac_cen u_frac_cen_1350(
-    .clk(CLK96),
-    .n(10'd9),
-    .m(10'd64),
-    .cen(CEN1350),
-    .cenb(CEN1350B)
-);
-
-//5.333mhz for Z80
-//48*(1/9) == 5.333
-jtframe_frac_cen u_frac_cen_5333(
+jtframe_frac_cen #(.W(2)) u_frac_cen_1350(
     .clk(CLK96),
     .n(1),
-    .m(18),
+    .m(7),
+    .cen({CEN675, CEN1350}),
+    .cenb({CEN675B, CEN1350B})
+);
+
+jtframe_frac_cen #(.WC(17)) u_frac_cen_5333(
+    .clk(CLK96),
+    .n(5333),
+    .m(94500),
     .cen(CEN5333),
     .cenb(CEN5333B)
 );
@@ -64,8 +52,8 @@ jtframe_frac_cen u_frac_cen_5333(
 //48*(441/1250) == 16.9344
 jtframe_frac_cen u_frac_cen_16p9344 (
     .clk(CLK96),
-    .n(441),
-    .m(2500),
+    .n(112),
+    .m(625),
     .cen(CEN16p9344),
     .cenb(CEN16p9344B)
 );

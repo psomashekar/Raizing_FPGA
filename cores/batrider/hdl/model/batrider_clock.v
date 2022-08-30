@@ -34,55 +34,35 @@ module batrider_clock (
     output CEN1350B
 );
 
-jtframe_frac_cen u_frac_cen_4(
+jtframe_frac_cen #(.W(2)) u_frac_cen_1350(
     .clk(CLK96),
     .n(1),
-    .m(24),
-    .cen(CEN4),
+    .m(7),
+    .cen({CEN675, CEN1350}),
+    .cenb({CEN675B, CEN1350B})
+);
+
+
+jtframe_frac_cen #(.W(2)) u_frac_cen_4(
+    .clk(CLK96),
+    .n(8),
+    .m(189),
+    .cen({CEN2, CEN4}),
     .cenb()
 );
 
-//ym2151 half clock
-jtframe_cendiv u_cen2(
+jtframe_frac_cen #(.WC(17)) u_frac_cen_5333(
     .clk(CLK96),
-    .cen_in(CEN4),
-    .cen_div(CEN2)
-);
-
-// //6.75mhz for GP9001
-// //96*(9/128) == 6.75
-jtframe_frac_cen u_frac_cen_675(
-    .clk(CLK96),
-    .n(10'd9),
-    .m(10'd128),
-    .cen(CEN675),
-    .cenb(CEN675B)
-);
-
-jtframe_frac_cen u_frac_cen_1350(
-    .clk(CLK96),
-    .n(10'd9),
-    .m(10'd64),
-    .cen(CEN1350),
-    .cenb(CEN1350B)
-);
-
-//5.333mhz for Z80
-//48*(1/9) == 5.333
-jtframe_frac_cen u_frac_cen_5333(
-    .clk(CLK96),
-    .n(1),
-    .m(18),
+    .n(5333),
+    .m(94500),
     .cen(CEN5333),
     .cenb(CEN5333B)
 );
 
-//3.2mhz for OKI6295
-//48*(1/15) == 3.2
 jtframe_frac_cen u_frac_cen_32 (
     .clk(CLK96),
-    .n(1),
-    .m(30),
+    .n(32),
+    .m(945),
     .cen(CEN3p2),
     .cenb(CEN3p2B)
 );
