@@ -22,7 +22,7 @@ set_global_assignment -name FINAL_PLACEMENT_OPTIMIZATION AUTOMATICALLY
 set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
 set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
 set_global_assignment -name ALLOW_POWER_UP_DONT_CARE ON
-set_global_assignment -name QII_AUTO_PACKED_REGISTERS "NORMAL"
+set_global_assignment -name QII_AUTO_PACKED_REGISTERS NORMAL
 set_global_assignment -name ROUTER_LCELL_INSERTION_AND_LOGIC_DUPLICATION ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
@@ -78,6 +78,7 @@ set_global_assignment -name VERILOG_MACRO "BAKRAID=1"
 ### Clock Inputs
 set_global_assignment -name VERILOG_MACRO "JTFRAME_CLK48=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_CLK96=1"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_PLL=raizingpll"
 
 ### SDRAM parameters
 set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM96=1"

@@ -10,23 +10,9 @@ set_multicycle_path -from [get_clocks {SDRAM_CLK}] -to [get_clocks {emu|pll|raiz
 
 set_multicycle_path -from [get_clocks {SDRAM_CLK}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -hold -end 2
 
-# Multicycle paths for setup time
-
-set_multicycle_path -setup -end -from [get_keepers {SDRAM_DQ[*]}] -to [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|dq_ff[*]}] 2
-#set_multicycle_path -setup -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|hold_bus}] -to [get_keepers {SDRAM_DQ[*]}] 2
-set_multicycle_path -setup -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|dq_ff[*]}] -to [get_keepers {SDRAM_DQ[*]}] 2
-set_multicycle_path -setup -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|SDRAM_DQMH}] -to [get_keepers {SDRAM_DQMH}] 2
-set_multicycle_path -setup -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|SDRAM_A[12]}] -to [get_keepers {SDRAM_DQMH}] 2
-# Multicycle paths for hold time
-
-set_multicycle_path -hold -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|dq_ff[*]}] -to [get_keepers {SDRAM_DQ[*]}] 2
-# set_multicycle_path -hold -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|hold_bus}] -to [get_keepers {SDRAM_DQ[*]}] 2
-set_multicycle_path -hold -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|SDRAM_DQMH}] -to [get_keepers {SDRAM_DQMH}] 2
-set_multicycle_path -hold -end -from [get_keepers {emu:emu|jtframe_mister:u_frame|jtframe_board:u_board|jtframe_sdram_bank:u_sdram|jtframe_sdram_bank_core:u_core|SDRAM_A[12]}] -to [get_keepers {SDRAM_DQMH}] 2
-
 #raizing obj
-set_multicycle_path -from {emu:emu|*_game:u_game|raizing_video:u_video|raizing_gcu:u_gcu|jtframe_dual_ram:u_spriteram2|jtframe_dual_ram_cen:u_ram|altsyncram:mem_rtl_0|altsyncram_tsi1:auto_generated|ram_block1a9~PORT_B_WRITE_ENABLE_REG} -to {emu:emu|*_game:u_game|raizing_video:u_video|raizing_obj:u_obj|sprite_queue_priority_n[121]} -setup -end 2
-set_multicycle_path -from {emu:emu|*_game:u_game|raizing_video:u_video|raizing_gcu:u_gcu|jtframe_dual_ram:u_spriteram2|jtframe_dual_ram_cen:u_ram|altsyncram:mem_rtl_0|altsyncram_tsi1:auto_generated|ram_block1a9~PORT_B_WRITE_ENABLE_REG} -to {emu:emu|*_game:u_game|raizing_video:u_video|raizing_obj:u_obj|sprite_queue_priority_n[121]} -hold -end 2
+set_multicycle_path -from {*|raizing_video:u_video|raizing_gcu:u_gcu|jtframe_dual_ram:u_spriteram2|jtframe_dual_ram_cen:u_ram|altsyncram:mem_rtl_0|altsyncram_tsi1:auto_generated|*} -to {*|raizing_video:u_video|raizing_obj:u_obj|sprite_queue_priority_n[*]} -setup -end 2
+set_multicycle_path -from {*|raizing_video:u_video|raizing_gcu:u_gcu|jtframe_dual_ram:u_spriteram2|jtframe_dual_ram_cen:u_ram|altsyncram:mem_rtl_0|altsyncram_tsi1:auto_generated|*} -to {*|raizing_video:u_video|raizing_obj:u_obj|sprite_queue_priority_n[*]} -hold -end 2
 set_multicycle_path -from [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk*}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -setup -end 2
 set_multicycle_path -from [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk*}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -hold -end 2
 
@@ -43,7 +29,6 @@ derive_clock_uncertainty
 
 # Decouple different clock groups (to simplify routing)
 set_clock_groups -exclusive \
-   -group [get_clocks { *|pll|pll_inst|altera_pll_i|*[*].*|divclk}] \
    -group [get_clocks { *|pll|raizingpll_inst|altera_pll_i|*[*].*|divclk}] \
    -group [get_clocks { pll_hdmi|pll_hdmi_inst|altera_pll_i|*[0].*|divclk}] \
    -group [get_clocks { pll_audio|pll_audio_inst|altera_pll_i|*[0].*|divclk}] \
