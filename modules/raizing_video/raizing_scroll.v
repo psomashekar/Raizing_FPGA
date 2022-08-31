@@ -249,7 +249,7 @@ always @(posedge CLK96, posedge RESET96) begin
     end else begin
         last_HB    <= HB;
 
-        if( (pedg_HB && !VB)  || (VRENDER == 0 && pedg_HB) ) begin
+        if( (pedg_HB && !VB)  || (((!FLIPX && VRENDER == 0) || (FLIPX && VRENDER == 239)) && pedg_HB)) begin
             start <= 1'b1;
         end
 
