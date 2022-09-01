@@ -40,7 +40,7 @@ jtframe_frac_cen #(.W(2)) u_frac_cen_1350(
     .cenb({CEN675B, CEN1350B})
 );
 
-jtframe_frac_cen #(.WC(17)) u_frac_cen_5333(
+jtframe_frac_cen #(.WC(20)) u_frac_cen_5333(
     .clk(CLK96),
     .n(5333),
     .m(94500),
