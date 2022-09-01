@@ -85,7 +85,7 @@ assign right = left;
 `endif
 
 //clock divider for sound irq
-integer c = 0, cen444 = 'd12000;
+integer c = 0, cen444 = 'd11999;
 wire cover = c==(cen444-1);
 
 always @(posedge CLK96, posedge RESET96) begin
