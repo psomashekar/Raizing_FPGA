@@ -100,8 +100,8 @@ wire [7:0]
 fmgain = GAME == GAREGGA ? 8'h08 :
          8'h10, 
 pcmgain = GAME == GAREGGA ? 8'h10 : 
-          GAME == SSTRIKER ? 8'h10 :
-          8'h10;
+          GAME == SSTRIKER ? 8'h18 :
+          8'h18;
 always @(posedge CLK96) begin
     peak <= peak_l | peak_r;
 end
