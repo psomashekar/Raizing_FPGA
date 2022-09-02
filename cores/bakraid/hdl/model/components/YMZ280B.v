@@ -566,7 +566,7 @@ module ChannelController(
   wire [2:0] _wrap_value_T_1 = channelCounter + 3'h1; // @[Counter.scala 46:22]
   wire  channelCounterWrap = _T_2 & wrap_wrap; // @[Counter.scala 86:{48,55}]
   reg [10:0] outputCounterWrap_value; // @[Counter.scala 40:34]
-  wire  outputCounterWrap_wrap_wrap = outputCounterWrap_value == 11'h43f; // @[Counter.scala 45:24]
+  wire  outputCounterWrap_wrap_wrap = outputCounterWrap_value == `YMZ280B_SAMPLE_RATE; // @[Counter.scala 45:24]
   wire [10:0] _outputCounterWrap_wrap_value_T_1 = outputCounterWrap_value + 11'h1; // @[Counter.scala 46:22]
   wire [120:0] _channelState_WIRE_1 = channelStateMem_channelState_MPORT_data;
   wire [15:0] channelState_audioPipelineState_loopSample = _channelState_WIRE_1[15:0]; // @[ChannelController.scala 100:92]
@@ -786,7 +786,7 @@ module ChannelController(
   assign channelStateMem_MPORT_en = _T | _T_10;
   assign io_done = _T_4 & channelStateReg_done; // @[ChannelController.scala 203:39]
   assign io_index = channelCounter; // @[ChannelController.scala 201:12]
-  assign io_audio_valid = outputCounterWrap_value == 11'h43f; // @[Counter.scala 45:24]
+  assign io_audio_valid = outputCounterWrap_value == `YMZ280B_SAMPLE_RATE; // @[Counter.scala 45:24]
   assign io_audio_bits_left = io_audio_bits_sample_left[15:0]; // @[ChannelController.scala 205:17]
   assign io_audio_bits_right = io_audio_bits_sample_right[15:0]; // @[ChannelController.scala 205:17]
   assign io_rom_rd = audioPipeline_io_pcmData_ready & ~pendingReg; // @[ChannelController.scala 122:48]

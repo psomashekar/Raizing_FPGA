@@ -18,8 +18,8 @@ set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS OFF
 set_global_assignment -name OPTIMIZE_POWER_DURING_FITTING "EXTRA EFFORT"
-set_global_assignment -name FINAL_PLACEMENT_OPTIMIZATION AUTOMATICALLY
-set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name FINAL_PLACEMENT_OPTIMIZATION NEVER
+set_global_assignment -name FITTER_EFFORT "FAST FIT"
 set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
 set_global_assignment -name ALLOW_POWER_UP_DONT_CARE ON
 set_global_assignment -name QII_AUTO_PACKED_REGISTERS NORMAL
@@ -41,6 +41,10 @@ set_global_assignment -name PERIPHERY_TO_CORE_PLACEMENT_AND_ROUTING_OPTIMIZATION
 set_global_assignment -name PHYSICAL_SYNTHESIS_ASYNCHRONOUS_SIGNAL_PIPELINING ON
 set_global_assignment -name ALM_REGISTER_PACKING_EFFORT HIGH
 set_global_assignment -name OPTIMIZE_POWER_DURING_SYNTHESIS OFF
+set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
+set_global_assignment -name OPTIMIZE_TIMING "NORMAL COMPILATION"
+set_global_assignment -name FITTER_AGGRESSIVE_ROUTABILITY_OPTIMIZATION NEVER
+set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION OFF
 
 ##################################################################
 ## Files
@@ -54,7 +58,7 @@ set_global_assignment -name SDC_FILE sys_top.sdc
 
 # MiSTer Framework
 set_global_assignment -name QIP_FILE modules/jtframe/target/mister/mister.qip
-set_global_assignment -name QIP_FILE cores/batrider/hdl/model/batrider.qip
+set_global_assignment -name QIP_FILE cores/bakraid/hdl/model/bakraid.qip
 set_global_assignment -name QIP_FILE game.qip
 
 set_global_assignment -name VERILOG_MACRO "MISTER=1"
@@ -69,11 +73,11 @@ set_instance_assignment -name FAST_OUTPUT_ENABLE_REGISTER ON -to SDRAM_DQ[*]
 set_global_assignment -name FORCE_SYNCH_CLEAR ON
 
 ### JTFRAME TARGET
-set_global_assignment -name VERILOG_MACRO "CORENAME=BATRIDER"
-set_global_assignment -name VERILOG_MACRO "GAMETOP=batrider_game"
+set_global_assignment -name VERILOG_MACRO "CORENAME=BAKRAID"
+set_global_assignment -name VERILOG_MACRO "GAMETOP=bakraid_game"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_RELEASE=1"
 set_global_assignment -name VERILOG_MACRO "TARGET=mister"
-set_global_assignment -name VERILOG_MACRO "BATRIDER=1"
+set_global_assignment -name VERILOG_MACRO "BAKRAID=1"
 
 ### Clock Inputs
 set_global_assignment -name VERILOG_MACRO "JTFRAME_CLK48=1"
@@ -83,20 +87,22 @@ set_global_assignment -name VERILOG_MACRO "JTFRAME_PLL=raizingpll"
 ### SDRAM parameters
 set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM96=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_BANKS=1"
+
+set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_AUTOPRECH=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_AUTOPRECH=0"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_AUTOPRECH=0"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_AUTOPRECH=0"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_LEN=64"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_LEN=64"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_LEN=64"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_LEN=64"
 #set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_REPACK=1"
 #set_global_assignment -name VERILOG_MACRO "JTFRAME_NOHOLDBUS=1"
-set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_AUTOPRECH=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_AUTOPRECH=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_AUTOPRECH=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_AUTOPRECH=1"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA0_LEN=64"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA1_LEN=64"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA2_LEN=64"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_BA3_LEN=64"
-#set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_CHECK=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_LARGE=1"
+#set_global_assignment -name VERILOG_MACRO "JTFRAME_SDRAM_LARGE=1"
 
 ### NVRAM parameters
-set_global_assignment -name VERILOG_MACRO "JTFRAME_IOCTL_RD=784"
+set_global_assignment -name VERILOG_MACRO "JTFRAME_IOCTL_RD=512"
 
 ### Screen parameters
 set_global_assignment -name VERILOG_MACRO "JTFRAME_COLORW=8"
@@ -125,7 +131,7 @@ set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_NOCREDITS=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_NOLOAD=1"
 set_global_assignment -name VERILOG_MACRO "JTFRAME_OSD_NOLOGO=1"
 set_global_assignment -name VERILOG_MACRO "SEPARATOR=-;"
-set_global_assignment -name VERILOG_MACRO "DATE=20220729"
+set_global_assignment -name VERILOG_MACRO "DATE=20220726"
 #set_global_assignment -name VERILOG_MACRO "NOCREDITS=1"
 
 set_global_assignment -name VERILOG_MACRO "SYNTHESIS=1"
@@ -153,10 +159,5 @@ set_global_assignment -name FAMILY "Cyclone V"
 
 set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
 set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
-set_instance_assignment -name QII_AUTO_PACKED_REGISTERS NORMAL -to "emu:emu|batrider_game:u_game|batrider_sound:u_sound|final_oki0"
-set_instance_assignment -name QII_AUTO_PACKED_REGISTERS NORMAL -to "emu:emu|batrider_game:u_game|batrider_sound:u_sound|final_oki1"
-set_instance_assignment -name QII_AUTO_PACKED_REGISTERS NORMAL -to "emu:emu|batrider_game:u_game|batrider_sound:u_sound|final_left"
-set_instance_assignment -name QII_AUTO_PACKED_REGISTERS NORMAL -to "emu:emu|batrider_game:u_game|batrider_sound:u_sound|gain1"
-set_instance_assignment -name QII_AUTO_PACKED_REGISTERS NORMAL -to "emu:emu|batrider_game:u_game|batrider_sound:u_sound|jtframe_mixer:u_mix_left"
 
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

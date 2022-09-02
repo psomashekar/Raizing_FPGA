@@ -51,7 +51,7 @@ jtframe_frac_cen #(.W(2)) u_frac_cen_4(
     .cenb()
 );
 
-jtframe_frac_cen #(.WC(17)) u_frac_cen_5333(
+jtframe_frac_cen #(.WC(20)) u_frac_cen_5333(
     .clk(CLK96),
     .n(5333),
     .m(94500),

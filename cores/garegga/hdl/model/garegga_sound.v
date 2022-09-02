@@ -95,7 +95,17 @@ wire [17:0] oki0_pcm_addr, oki1_pcm_addr;
  `ifdef SIMULATION
  initial fd = $fopen("logsound.txt", "w");
 `endif
-
+/*
+0: pcmgain <= 8'h10 ;   // 100%
+1: pcmgain <= 8'h20 ;   // 200%
+2: pcmgain <= 8'h0c ;   // 75%
+3: pcmgain <= 8'h08 ;   // 50%
+*/
+wire [7:0] fx_mult = FX_LEVEL == 0 ? 8'h10 :
+                     FX_LEVEL == 1 ? 8'h20 :
+                     FX_LEVEL == 2 ? 8'h0c :
+                     FX_LEVEL == 3 ? 8'h08 :
+                     8'h10; 
 wire [7:0] 
 fmgain = GAME == GAREGGA ? 8'h08 :
          8'h10, 
@@ -112,7 +122,7 @@ reg signed [13:0] final_oki0;
 always @(posedge CLK96) begin
     final_left<=GAME==GAREGGA ? fm0_left : fm1_left;
     final_oki0<=GAME==GAREGGA ? oki0_pre : oki1_pre;
-    gain1<=pcmgain + (FX_LEVEL<<1);
+    gain1<=fx_mult;
 end
 
 assign right = left;
@@ -265,16 +275,13 @@ jtframe_ff u_m68wait_ff(
     .clr      ( soundlatch_ack ),    // active high
     .sigedge  ( Z80INT     ) // signal whose edge will trigger the FF
 );
-reg z80int_n;
-always @(*) begin
-    if(GAME == GAREGGA) z80int_n=int_n;
-    else z80int_n=ym_irq_n;
-end
+wire z80int_n = GAME == GAREGGA ? int_n : ym_irq_n;
 
 //wait_n generation
 wire busak_n, wait_n;
-reg [2-1:0] ss_wsh;
-reg [1-1:0] kgp_wsh;
+localparam ss_wait = 2, kgp_wait = 1;
+reg [ss_wait-1:0] ss_wsh;
+reg [kgp_wait-1:0] kgp_wsh;
 reg m1n_l;
 always @(posedge CLK96, posedge RESET96 ) begin
     if( RESET96 ) begin
@@ -284,18 +291,18 @@ always @(posedge CLK96, posedge RESET96 ) begin
         m1n_l <= m1_n;
         case(GAME)
             SSTRIKER: begin
-                if( !m1_n && m1n_l) ss_wsh <= {2{1'b1}};
+                if( !m1_n && m1n_l) ss_wsh <= {ss_wait{1'b1}};
                 else ss_wsh <= ss_wsh>>1;
             end
             KINGDMGP: begin
-                if (!m1_n && m1n_l) kgp_wsh <= {1{1'b1}};
+                if (!m1_n && m1n_l) kgp_wsh <= {kgp_wait{1'b1}};
                 else kgp_wsh <= kgp_wsh>>1;
             end
         endcase
     end
 end
-assign wait_n = GAME == KINGDMGP ? ~kgp_wsh[0] : 
-                GAME == SSTRIKER ? ~ss_wsh[0] :
+assign wait_n = GAME == KINGDMGP ? ~fm1_dout[7] : 
+                GAME == SSTRIKER ? ~fm1_dout[7] :
                 1;
 
 jtframe_z80wait #(1) u_wait(
