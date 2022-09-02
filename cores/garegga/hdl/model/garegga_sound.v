@@ -95,13 +95,23 @@ wire [17:0] oki0_pcm_addr, oki1_pcm_addr;
  `ifdef SIMULATION
  initial fd = $fopen("logsound.txt", "w");
 `endif
-
+/*
+0: pcmgain <= 8'h10 ;   // 100%
+1: pcmgain <= 8'h20 ;   // 200%
+2: pcmgain <= 8'h0c ;   // 75%
+3: pcmgain <= 8'h08 ;   // 50%
+*/
+wire [7:0] fx_mult = FX_LEVEL == 0 ? 8'h10 :
+                     FX_LEVEL == 1 ? 8'h20 :
+                     FX_LEVEL == 2 ? 8'h0c :
+                     FX_LEVEL == 3 ? 8'h08 :
+                     8'h10; 
 wire [7:0] 
 fmgain = GAME == GAREGGA ? 8'h08 :
          8'h10, 
 pcmgain = GAME == GAREGGA ? 8'h10 : 
-          GAME == SSTRIKER ? 8'h18 :
-          8'h18;
+          GAME == SSTRIKER ? 8'h10 :
+          8'h10;
 always @(posedge CLK96) begin
     peak <= peak_l | peak_r;
 end
@@ -112,7 +122,7 @@ reg signed [13:0] final_oki0;
 always @(posedge CLK96) begin
     final_left<=GAME==GAREGGA ? fm0_left : fm1_left;
     final_oki0<=GAME==GAREGGA ? oki0_pre : oki1_pre;
-    gain1<=pcmgain + (FX_LEVEL<<1);
+    gain1<=fx_mult;
 end
 
 assign right = left;

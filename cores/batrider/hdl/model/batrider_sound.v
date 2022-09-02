@@ -90,6 +90,18 @@ wire [17:0] oki0_pcm_addr, oki1_pcm_addr;
  initial fd = $fopen("logsound.txt", "w");
 `endif
 
+/*
+0: pcmgain <= 8'h10 ;   // 100%
+1: pcmgain <= 8'h20 ;   // 200%
+2: pcmgain <= 8'h0c ;   // 75%
+3: pcmgain <= 8'h08 ;   // 50%
+*/
+
+wire [7:0] fx_mult = FX_LEVEL == 0 ? 8'h10 :
+                     FX_LEVEL == 1 ? 8'h20 :
+                     FX_LEVEL == 2 ? 8'h0c :
+                     FX_LEVEL == 3 ? 8'h08 :
+                     8'h10; 
 localparam [7:0] fmgain = 8'h10, pcmgain = 8'h10;
 always @(posedge CLK96) begin
     peak <= peak_l | peak_r;
@@ -102,7 +114,7 @@ always @(posedge CLK96) begin
     final_left<=fm_left;
     final_oki0<=oki0_pre;
     final_oki1<=oki1_pre;
-    gain1<=pcmgain + (FX_LEVEL<<1);
+    gain1<=fx_mult;
 end
 
 assign right = left;

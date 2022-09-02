@@ -119,3 +119,5 @@ set_false_path  -from  [get_clocks {FPGA_CLK2_50}]  -to  [get_clocks {emu|pll|ra
 set_false_path  -from  [get_clocks {pll_hdmi|pll_hdmi_inst|altera_pll_i|cyclonev_pll|counter[0].output_counter|divclk}]  -to  [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}]
 set_false_path  -from  [get_clocks {FPGA_CLK1_50}]  -to  [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}]
 set_false_path -to [get_keepers {*altera_std_synchronizer:*|din_s1}]
+
+set_false_path -from [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}]

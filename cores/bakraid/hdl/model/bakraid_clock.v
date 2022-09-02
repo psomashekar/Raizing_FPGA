@@ -20,7 +20,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 module bakraid_clock (
-    input CLK, //48mhz
+    input CLK, //47.25
     input CLK96,
     output CEN675,
     output CEN675B,
@@ -40,10 +40,10 @@ jtframe_frac_cen #(.W(2)) u_frac_cen_1350(
     .cenb({CEN675B, CEN1350B})
 );
 
-jtframe_frac_cen #(.WC(20)) u_frac_cen_5333(
-    .clk(CLK96),
-    .n(5333),
-    .m(94500),
+jtframe_frac_cen #(.WC(32)) u_frac_cen_5333(
+    .clk(CLK),
+    .n(484793213),
+    .m((2**32) - 1),
     .cen(CEN5333),
     .cenb(CEN5333B)
 );
