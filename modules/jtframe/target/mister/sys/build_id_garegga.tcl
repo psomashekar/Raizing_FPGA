@@ -5,8 +5,7 @@
 proc generateBuildID_Verilog {} {
 
 	# Get the timestamp (see: http://www.altera.com/support/examples/tcl/tcl-date-time-stamp.html)
-	set buildDate "`define BUILD_DATE \"[clock format [ clock seconds ] -format %y%m%d]\""
-	set buildDateHex "`define BUILD_DATE_HEX 48'h[binary encode hex [clock format [ clock seconds ] -format %y%m%d]]"
+	set buildDate "[clock format [ clock seconds ] -format %y%m%d]"
 
 	# Create a Verilog file for output
 	set outputFileName "cfgstr_garegga.txt"
