@@ -426,7 +426,7 @@ jtframe_68kdtack #(.W(10)) u_dtack(
     .bus_busy   (bus_busy),
     .bus_legit  (1'b0),
     .ASn        (ASn),
-    .DSn        ({UDSn, LDSn}),
+    .DSn        ({UDSn, LDSn} | {2{bus_legit}}),
     .num        (10'd32),
     .den        (10'd189),
     .DTACKn     (DTACKn),
