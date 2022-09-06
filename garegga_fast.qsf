@@ -267,7 +267,7 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED_*
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to BTN_*
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to BTN_*
 
-set_global_assignment -name PRE_FLOW_SCRIPT_FILE "quartus_sh:modules/jtframe/target/mister/sys/build_id.tcl"
+set_global_assignment -name PRE_FLOW_SCRIPT_FILE "quartus_sh:modules/jtframe/target/mister/sys/build_id_garegga.tcl"
 # SDC file is copied and edited in the target folder
 set_global_assignment -name SDC_FILE sys_top.sdc
 

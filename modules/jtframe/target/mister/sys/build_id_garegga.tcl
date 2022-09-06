@@ -5,24 +5,27 @@
 proc generateBuildID_Verilog {} {
 
 	# Get the timestamp (see: http://www.altera.com/support/examples/tcl/tcl-date-time-stamp.html)
-	set buildDate "`define BUILD_DATE \"[clock format [ clock seconds ] -format %y%m%d]\""
+	set buildDate "[clock format [ clock seconds ] -format %y%m%d]"
 
 	# Create a Verilog file for output
-	set outputFileName "build_id.v"
+	set outputFileName "cfgstr_garegga.txt"
+	set outputFileNameCfgstr "cfgstr_garegga.hex"
 	
 	set fileData ""
 	if { [file exists $outputFileName]} {
 		set outputFile [open $outputFileName "r"]
 		set fileData [read $outputFile]
 		close $outputFile	
-	}
-
-	if {$buildDate ne $fileData} {
+		set fileData [regsub "(V,v20)(.*)" $fileData "\\1$buildDate"]
 		set outputFile [open $outputFileName "w"]
-		puts -nonewline $outputFile $buildDate
+		puts -nonewline $outputFile $fileData
 		close $outputFile
-		# Send confirmation message to the Messages window
-		post_message "Generated: [pwd]/$outputFileName: $buildDate"
+
+		set outputHexData [binary encode hex $fileData]
+		set outputFile [open $outputFileNameCfgstr "w"]
+		puts -nonewline $outputFile [string trimright [regsub -all {..} $outputHexData {& }]]
+		
+		post_message "Updated $outputFileName and $outputFileNameCfgstr"
 	}
 }
 
