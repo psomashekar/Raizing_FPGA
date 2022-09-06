@@ -52,7 +52,7 @@ set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION OFF
 set_global_assignment -name SOURCE_TCL_SCRIPT_FILE modules/jtframe/target/mister/sys/sys.tcl
 set_global_assignment -name SOURCE_TCL_SCRIPT_FILE modules/jtframe/target/mister/sys/sys_analog.tcl
 
-set_global_assignment -name PRE_FLOW_SCRIPT_FILE "quartus_sh:modules/jtframe/target/mister/sys/build_id.tcl"
+set_global_assignment -name PRE_FLOW_SCRIPT_FILE "quartus_sh:modules/jtframe/target/mister/sys/build_id_bakraid.tcl"
 # SDC file is copied and edited in the target folder
 set_global_assignment -name SDC_FILE sys_top.sdc
 
