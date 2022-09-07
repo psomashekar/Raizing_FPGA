@@ -112,8 +112,8 @@ end
 
 wire [7:0] fx_mult = FX_LEVEL == 2 ? 8'h10 :
                      FX_LEVEL == 3 ? 8'h20 :
-                     FX_LEVEL == 0 ? 8'h0c :
-                     FX_LEVEL == 1 ? 8'h08 :
+                     FX_LEVEL == 1 ? 8'h0c :
+                     FX_LEVEL == 0 ? 8'h08 :
                      8'h10; 
 localparam [7:0] pcmgain = 8'h10;
 always @(posedge CLK) begin
