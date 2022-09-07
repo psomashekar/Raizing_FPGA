@@ -88,16 +88,16 @@ assign right = left;
 
 //clock divider for sound irq
 integer c = 0, cen444 = 'd12000;
-wire cover = c==(cen444-1);
+wire c_over = c==(cen444-1);
 
 always @(posedge CLK, posedge RESET) begin
     if(RESET) begin
         int_n <= 1;
         c <= 0;
     end else if(Z80_CEN) begin 
-        c <= cover ? 0 : (c+1);
+        c <= c_over ? 0 : (c+1);
         if(!iorq_n && !m1_n) int_n <= 1;
-        else if(cover) int_n<=0;
+        else if(c_over) int_n<=0;
     end
 end
 
@@ -108,8 +108,8 @@ end
 3: pcmgain <= 8'h08 ;   // 50%
 */
 
-wire [7:0] fx_mult = FX_LEVEL == 3 ? 8'h10 :
-                     FX_LEVEL == 2 ? 8'h20 :
+wire [7:0] fx_mult = FX_LEVEL == 2 ? 8'h10 :
+                     FX_LEVEL == 3 ? 8'h20 :
                      FX_LEVEL == 0 ? 8'h0c :
                      FX_LEVEL == 1 ? 8'h08 :
                      8'h10; 
@@ -297,20 +297,12 @@ reg [1:0] st = 0;
 wire [1:0] sd_bank = PCM2_CS ? 2 :
                      PCM1_CS ? 1 :
                      0;
-reg [21:0] pcm_addr, pcm1_addr, pcm2_addr;
 assign PCM_CS=ymz_mem_addr>=0 && ymz_mem_addr<'h400000 && ymz_io_rd;
 assign PCM1_CS=ymz_mem_addr>='h400000 && ymz_mem_addr<'h800000 && ymz_io_rd;
 assign PCM2_CS=ymz_mem_addr>='h800000 && ymz_mem_addr<'hC00000 && ymz_io_rd;
-assign PCM_ADDR=pcm_addr;
-assign PCM1_ADDR=pcm1_addr;
-assign PCM2_ADDR=pcm2_addr;
-
-always @(*) begin
-    pcm_addr<=PCM_CS ? ymz_mem_addr[21:0] : PCM_ADDR;
-    pcm1_addr<=PCM1_CS ? ymz_mem_addr[21:0] : PCM1_ADDR;
-    pcm2_addr<=PCM2_CS ? ymz_mem_addr[21:0] : PCM2_ADDR;
-end
-
+assign PCM_ADDR=PCM_CS ? ymz_mem_addr[21:0] : PCM_ADDR;
+assign PCM1_ADDR=PCM1_CS ? ymz_mem_addr[21:0] : PCM1_ADDR;
+assign PCM2_ADDR=PCM2_CS ? ymz_mem_addr[21:0] : PCM2_ADDR;
 wire over_cs = ymz_mem_addr >= 'hC00000 && ymz_io_rd;
 
 wire [7:0] io_rom_dout = PCM_CS && PCM_OK ? PCM_DOUT :
