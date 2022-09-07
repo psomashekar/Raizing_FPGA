@@ -101,10 +101,10 @@ wire [17:0] oki0_pcm_addr, oki1_pcm_addr;
 2: pcmgain <= 8'h0c ;   // 75%
 3: pcmgain <= 8'h08 ;   // 50%
 */
-wire [7:0] fx_mult = FX_LEVEL == 3 ? 8'h10 :
-                     FX_LEVEL == 2 ? 8'h20 :
-                     FX_LEVEL == 0 ? 8'h0c :
-                     FX_LEVEL == 1 ? 8'h08 :
+wire [7:0] fx_mult = FX_LEVEL == 2 ? 8'h10 :
+                     FX_LEVEL == 3 ? 8'h20 :
+                     FX_LEVEL == 1 ? 8'h0c :
+                     FX_LEVEL == 0 ? 8'h08 :
                      8'h10; 
 wire [7:0] 
 fmgain = GAME == GAREGGA ? 8'h08 :
