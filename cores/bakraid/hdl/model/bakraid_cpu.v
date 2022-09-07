@@ -111,6 +111,8 @@ module bakraid_cpu (
     output Z80CS,
     output reg NMI,
     input SNDIRQ,
+    output reg [1:0] SOUNDLATCH_ACK,
+    input [1:0] SOUNDLATCH_ACK_INCOMING,
 
     //eeprom interface
     output reg         EEPROM_SCLK,
@@ -182,13 +184,11 @@ always @(posedge CLK96, posedge RESET96) begin
     end
 end
 
-wire bus_legit = sel_z80 & Z80WAIT;
-
 wire FC0, FC1, FC2;
 wire VPAn = ~&{ FC0, FC1, FC2, ~ASn};
 wire BRn, BGACKn, BGn, DTACKn;
 wire bus_cs = |{ pre_sel_rom, pre_sel_ram, pre_sel_vram, pre_sel_zrom, sel_gp9001, sel_io, sel_z80};
-wire bus_busy = |{ (sel_ram | sel_vram) & ~ram_ok, sel_rom & ~CPU_PRG_OK, sel_zrom & ~Z80_PRG_OK, sel_gp9001 & ~GP9001ACK, bus_legit};
+wire bus_busy = |{ (sel_ram | sel_vram) & ~ram_ok, sel_rom & ~CPU_PRG_OK, sel_zrom & ~Z80_PRG_OK, sel_gp9001 & ~GP9001ACK, sel_z80 & Z80WAIT};
 
 //batrider i/o bus ports
 reg gp9001_vdp_device_r_cs, gp9001_vdp_device_w_cs, read_port_in_r_cs, read_port_sys_dsw_r_cs, 
@@ -273,8 +273,6 @@ always @(*) begin
     batrider_textdata_dma_w_cs = sel_io && (addr_8[7:0] == 8'h80); //0x500080-81
     batrider_unk_dma_w = sel_io && (addr_8[7:0] == 8'h82); //0x500082
     batrider_objectbank_w_cs = sel_io && addr_8[7:4] == 4'hC; //0x5000C0-CF
-    NMI = sel_io && (batrider_soundlatch_w_cs || batrider_soundlatch2_w_cs);
-    // sel_z80 = sel_io && (batrider_unk_sound_w_cs);
 end
 
 assign Z80CS = sel_z80;
@@ -361,11 +359,19 @@ always @(posedge CLK96) begin
             end
         end
 
+        SOUNDLATCH_ACK<=SOUNDLATCH_ACK_INCOMING; // synchronize from z80
+
+        sel_z80 <= batrider_soundlatch_w_cs || batrider_soundlatch2_w_cs;
+        
         if(batrider_soundlatch_w_cs) begin
             SOUNDLATCH <= cpu_dout[7:0];
+            SOUNDLATCH_ACK[0] <= 0;
+            NMI <= 1;
         end
         else if(batrider_soundlatch2_w_cs) begin
             SOUNDLATCH2 <= cpu_dout[7:0];
+            SOUNDLATCH_ACK[1] <= 0;
+            NMI <= 1;
         end
         
         else if(batrider_textdata_dma_w_cs) begin 
@@ -394,6 +400,8 @@ always @(posedge CLK96) begin
             endcase
         end
         else begin
+            NMI<=0;
+
             if(!TVRAMCTL_BUSY) begin
                 BATRIDER_TEXTDATA_DMA_W<=1'b0;
                 BATRIDER_PAL_TEXT_DMA_W<=1'b0;

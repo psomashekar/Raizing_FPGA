@@ -57,7 +57,9 @@ module bakraid_sound (
     input          [7:0] SOUNDLATCH,
     input          [7:0] SOUNDLATCH2,
     input          [1:0] FX_LEVEL,
-    input		 DIP_PAUSE
+    input		 DIP_PAUSE,
+    output reg     [1:0] SOUNDLATCH_ACK,
+    input          [1:0] SOUNDLATCH_ACK_INCOMING
 );
 //clock freq/88200 -1
 `define YMZ280B_SAMPLE_RATE ((47250000/88200)-1)
@@ -222,13 +224,17 @@ always @(posedge CLK, posedge RESET) begin
             ymzrd: din<=fm_dout;
             default: din <= 8'hFF;
         endcase
+        
+        SOUNDLATCH_ACK<=SOUNDLATCH_ACK_INCOMING; //synchronize with 68k
 
         if(soundlatch3_wr) begin
             SOUNDLATCH3 <= dout;
+            SOUNDLATCH_ACK[0] <= 1;
         end
 
         else if(soundlatch4_wr) begin
             SOUNDLATCH4 <= dout;
+            SOUNDLATCH_ACK[1] <= 1;
         end
     end
 end
@@ -253,7 +259,7 @@ jtframe_ff u_m68wait_ff(
     .q        ( WAIT            ),
     .qn       (        ),
     .set      ( 1'b0        ),    // active high
-    .clr      ( soundlatch3_wr || soundlatch4_wr),    // active high
+    .clr      ( |SOUNDLATCH_ACK ),    // release hold on 68k when all ack finished.
     .sigedge  ( CS     ) // signal whose edge will trigger the FF
 );
 
