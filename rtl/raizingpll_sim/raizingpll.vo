@@ -268,7 +268,7 @@ module  raizingpll
 		raizingpll_altera_pll_altera_pll_i_2934.phase_shift2 = "0 ps",
 		raizingpll_altera_pll_altera_pll_i_2934.phase_shift3 = "0 ps",
 		raizingpll_altera_pll_altera_pll_i_2934.phase_shift4 = "0 ps",
-		raizingpll_altera_pll_altera_pll_i_2934.phase_shift5 = "-2116 ps",
+		raizingpll_altera_pll_altera_pll_i_2934.phase_shift5 = "-5026 ps",
 		raizingpll_altera_pll_altera_pll_i_2934.phase_shift6 = "0 ps",
 		raizingpll_altera_pll_altera_pll_i_2934.phase_shift7 = "0 ps",
 		raizingpll_altera_pll_altera_pll_i_2934.phase_shift8 = "0 ps",
