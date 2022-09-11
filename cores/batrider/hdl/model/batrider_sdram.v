@@ -152,8 +152,8 @@ reg [1:0] pre_ba;
 
 wire [25:0] bulk_addr = IOCTL_ADDR;
 wire [25:0] cpu_addr = bulk_addr - ROM_BASE;
-wire [25:0] snd_addr = (bulk_addr - SND_BASE) + ROM01_PRG_LEN; //because we load sound, 68k and pcm data in same bank.
-wire [25:0] pcm_addr = (bulk_addr - PCM_BASE) + ROMZ80_PRG_LEN + ROM01_PRG_LEN; 
+wire [25:0] snd_addr = (bulk_addr - SND_BASE) + ROM01_PRG_LEN; //because we load sound, 68k in same bank.
+wire [25:0] pcm_addr = (bulk_addr - PCM_BASE); 
 wire [25:0] tile_addr = bulk_addr - TILE_BASE;
 
 assign PROG_DATA = {2{pre_data}};
@@ -176,9 +176,9 @@ always @(posedge CLK) begin
 					'hxx;
 		pre_ba <=  is_cpu ? 2'h0 : //cpu program
 				   is_snd ? 2'h0 : //snd program
-				   is_pcm ? 2'h0 : //pcm data
+				   is_pcm ? 2'h3 : //pcm data
 				   is_tile ? tile_addr[23] + 2'h1 : //tiles/gfx first/second half
-				   2'h3; //nothing
+				   2'hx; //nothing
         // $display("%h, %h, %h", pre_addr, IOCTL_ADDR, IOCTL_DOUT);
     end else begin
 		if(!DOWNLOADING || PROG_RDY) PROG_WE<=1'b0;
@@ -206,7 +206,7 @@ assign ROMZ801_OK=1'b1;
 assign ROMZ801_DOUT = z80prg[ROMZ801_ADDR];
 
 `else
-jtframe_rom_5slots #(
+jtframe_rom_3slots #(
 	.SDRAMW(22),
 
 	.SLOT0_AW    (20), //68k rom (16 bit addressing)
@@ -219,28 +219,14 @@ jtframe_rom_5slots #(
 	.SLOT1_LATCH (1),
 	.SLOT1_DOUBLE(1),
 
-
-	.SLOT2_AW    (21), //PCM rom (8 bit addressing)
+	.SLOT2_AW    (18), //z80 rom mirror (8 bit addressing)
 	.SLOT2_DW    (8),
-	.SLOT2_LATCH (0),
+	.SLOT2_LATCH (1),
 	.SLOT2_DOUBLE(1),
-
-	.SLOT3_AW    (18), //z80 rom mirror (8 bit addressing)
-	.SLOT3_DW    (8),
-	.SLOT3_LATCH (1),
-	.SLOT3_DOUBLE(1),
-
-	.SLOT4_AW    (21), //PCM rom mirror (8 bit addressing)
-	.SLOT4_DW    (8),
-	.SLOT4_LATCH (0),
-	.SLOT4_DOUBLE(1),
-
 
 	.SLOT0_OFFSET(0),
 	.SLOT1_OFFSET(ROM01_PRG_LEN>>1),
-	.SLOT2_OFFSET((ROM01_PRG_LEN+ROMZ80_PRG_LEN)>>1),
-	.SLOT3_OFFSET(ROM01_PRG_LEN>>1),
-	.SLOT4_OFFSET((ROM01_PRG_LEN+ROMZ80_PRG_LEN)>>1)
+	.SLOT2_OFFSET(ROM01_PRG_LEN>>1)
 ) u_bank0 (
 	.rst         (RESET),
 	.clk         (CLK),
@@ -255,20 +241,10 @@ jtframe_rom_5slots #(
 	.slot1_addr  (ROMZ80_ADDR ^ 1'b1),
 	.slot1_dout  (ROMZ80_DOUT),
 
-	.slot2_cs    (PCM_CS),
-	.slot2_ok    (PCM_OK),
-	.slot2_addr  (PCM_ADDR ^ 1'b1),
-	.slot2_dout  (PCM_DOUT),
-
-	.slot3_cs    (ROMZ801_CS),
-	.slot3_ok    (ROMZ801_OK),
-	.slot3_addr  (ROMZ801_ADDR ^ 1'b1),
-	.slot3_dout  (ROMZ801_DOUT),
-
-	.slot4_cs    (PCM1_CS),
-	.slot4_ok    (PCM1_OK),
-	.slot4_addr  (PCM1_ADDR ^ 1'b1),
-	.slot4_dout  (PCM1_DOUT),
+	.slot2_cs    (ROMZ801_CS),
+	.slot2_ok    (ROMZ801_OK),
+	.slot2_addr  (ROMZ801_ADDR ^ 1'b1),
+	.slot2_dout  (ROMZ801_DOUT),
 
 	.sdram_addr  (BA0_ADDR),
 	.sdram_req   (BA_RD[0]),
@@ -382,6 +358,40 @@ jtframe_rom_4slots #(
 	.sdram_ack   (BA_ACK[2]),
 	.data_dst    (BA_DST[2]),
 	.data_rdy    (BA_RDY[2]),
+	.data_read   (DATA_READ)
+);
+
+//pcm data
+jtframe_rom_2slots #(
+    .SDRAMW      (22),
+	.SLOT0_AW    (21), //PCM rom (8 bit addressing)
+	.SLOT0_DW    (8),
+	.SLOT0_LATCH (0),
+	.SLOT0_DOUBLE(1),
+
+	.SLOT1_AW    (21), //PCM rom mirror (8 bit addressing)
+	.SLOT1_DW    (8),
+	.SLOT1_LATCH (0),
+	.SLOT1_DOUBLE(1)
+) u_bank3 (
+    .rst         (RESET),
+	.clk         (CLK),
+
+	.slot0_cs    (PCM_CS),
+	.slot0_ok    (PCM_OK),
+	.slot0_addr  (PCM_ADDR ^ 1'b1),
+	.slot0_dout  (PCM_DOUT),
+
+	.slot1_cs    (PCM1_CS),
+	.slot1_ok    (PCM1_OK),
+	.slot1_addr  (PCM1_ADDR ^ 1'b1),
+	.slot1_dout  (PCM1_DOUT),
+
+	.sdram_addr  (BA3_ADDR),
+	.sdram_req   (BA_RD[3]),
+	.sdram_ack   (BA_ACK[3]),
+	.data_dst    (BA_DST[3]),
+	.data_rdy    (BA_RDY[3]),
 	.data_read   (DATA_READ)
 );
 
