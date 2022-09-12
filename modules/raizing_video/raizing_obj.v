@@ -65,6 +65,7 @@ reg [8:0] spr = 0;
 wire [12:0] sprite_addr_base = spriteram_offs+(spr[7:0]*4); //16 bit addressing
 reg last_HB = 0, start = 0;
 wire pedg_HB = !HB && last_HB;
+reg last_VB = 0;
 reg busy = 1'b0;
 wire [7:0] nb_pixels = {|GFX_DATA[31:28], |GFX_DATA[27:24], |GFX_DATA[23:20], |GFX_DATA[19:16], 
                         |GFX_DATA[15:12], |GFX_DATA[11:8], |GFX_DATA[7:4], |GFX_DATA[3:0]};
@@ -162,6 +163,8 @@ always @(posedge CLK96, posedge RESET96) begin
     end
     
 end
+reg [255:0] spr_idx_queue = 256'd0;
+reg spr_idx_queue_reset = 1;
 
 always @(posedge CLK96, posedge RESET96) begin
     if(RESET96) begin
@@ -212,13 +215,21 @@ always @(posedge CLK96, posedge RESET96) begin
         GP9001RAM2_GCU_ADDR<=0;
         pri_has_sprite <= 16'd0;
         spr_q_we<=1'b0;
+        spr_idx_queue <= 256'd0;
+        spr_idx_queue_reset <= 1'b1;
     end else begin
         // $display("H:%d", H);
         last_HB    <= HB;
+        last_VB    <= VB;
         c<=c+1;
 
         if( (pedg_HB && !VB)  || (((!FLIPX && VRENDER == 0) || (FLIPX && VRENDER == 239)) && pedg_HB)) begin
             start <= 1'b1;
+        end
+
+        if(VB && !last_VB) begin //reset the sprite idx queue in vb period once.
+            spr_idx_queue<=256'd0;
+            spr_idx_queue_reset<=1'b1;
         end
 
         if(start && !busy) begin
@@ -276,9 +287,16 @@ always @(posedge CLK96, posedge RESET96) begin
             case(st)
                 0: begin //begin scanning the sprite position
                     if(spr<max_sprite) begin
-                        GP9001RAM_GCU_ADDR<= sprite_addr_base;
-                        GP9001RAM2_GCU_ADDR<= sprite_addr_base+3;
+                        if(!spr_idx_queue_reset && !spr_idx_queue[spr]) begin //if the idx queue is initialized, and there's no sprite in this slot, skip over.
+                            spr<=spr+1;
+                            st<=st;
+                        end else begin
+                            GP9001RAM_GCU_ADDR<= sprite_addr_base;
+                            GP9001RAM2_GCU_ADDR<= sprite_addr_base+3;
+                        end
                     end else begin
+                        if(spr_idx_queue_reset) spr_idx_queue_reset<=0; //queue is initialized completely on first line.
+
                         if(sprite_queue_n == 0) begin
                             busy<=0;
                             start<=1'b0;
@@ -316,6 +334,10 @@ always @(posedge CLK96, posedge RESET96) begin
                 end
                 2: begin //check if the sprite is active
                     if(GP9001RAM_GCU_DOUT[15]) begin //sprite is active
+                        if(spr_idx_queue_reset) begin //fill spr idx queue on first line.
+                            spr_idx_queue[spr]<=1;
+                        end
+                        
                         mc=GP9001RAM_GCU_DOUT[14]; //is a multiconnected sprite
                         yfl= GP9001RAM_GCU_DOUT[13]; //is y-flipped
                         xfl= GP9001RAM_GCU_DOUT[12]; //is x-flipped
