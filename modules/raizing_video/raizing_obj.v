@@ -64,7 +64,6 @@ localparam spriteram_offs = 'h0;
 reg [8:0] spr = 0;
 wire [12:0] sprite_addr_base = spriteram_offs+(spr[7:0]*4); //16 bit addressing
 reg last_HB = 0, start = 0;
-reg last_VB = 0;
 wire pedg_HB = !HB && last_HB;
 reg busy = 1'b0;
 wire [7:0] nb_pixels = {|GFX_DATA[31:28], |GFX_DATA[27:24], |GFX_DATA[23:20], |GFX_DATA[19:16], 
@@ -81,7 +80,7 @@ reg [8:0] sprite_queue_priority_n_scan_buf_i = 0;
 reg [4:0] priority_i = 0;
 reg [8:0] spr_scan_i = 0;
 
-reg [4:0] spr_x_render = 0;
+reg [4:0] spr_x_render = 0, spr_x_render1 = 0;
 
 //attribute vars
 reg [63:0] sprite_attributes = 64'h0 /* synthesis keep preserve noprune*/;
@@ -164,9 +163,6 @@ always @(posedge CLK96, posedge RESET96) begin
     
 end
 
-reg [255:0] spr_idx_queue = 256'd0;
-reg spr_idx_queue_reset = 1;
-
 always @(posedge CLK96, posedge RESET96) begin
     if(RESET96) begin
         st<=0;
@@ -188,6 +184,7 @@ always @(posedge CLK96, posedge RESET96) begin
         clr<=1'b1;
         clr_addr<=0;
         spr_x_render <= 0;
+        spr_x_render1 <= 0;
         sprite_attributes <= 64'h0;
         palette <= 0;
         sprite_num <= 0;
@@ -215,21 +212,13 @@ always @(posedge CLK96, posedge RESET96) begin
         GP9001RAM2_GCU_ADDR<=0;
         pri_has_sprite <= 16'd0;
         spr_q_we<=1'b0;
-        spr_idx_queue <= 256'd0;
-        spr_idx_queue_reset <= 1'b1;
     end else begin
         // $display("H:%d", H);
         last_HB    <= HB;
-        last_VB    <= VB;
         c<=c+1;
 
         if( (pedg_HB && !VB)  || (((!FLIPX && VRENDER == 0) || (FLIPX && VRENDER == 239)) && pedg_HB)) begin
             start <= 1'b1;
-        end
-
-        if(VB && !last_VB) begin //reset the sprite idx queue in vb period once.
-            spr_idx_queue<=256'd0;
-            spr_idx_queue_reset<=1'b1;
         end
 
         if(start && !busy) begin
@@ -255,6 +244,7 @@ always @(posedge CLK96, posedge RESET96) begin
             yfl=0;
             xfl=0;
             spr_x_render <= 0;
+            spr_x_render1 <= 0;
             sprite_attributes <= 64'h0;
             palette <= 0;
             sprite_num <= 0;
@@ -286,16 +276,9 @@ always @(posedge CLK96, posedge RESET96) begin
             case(st)
                 0: begin //begin scanning the sprite position
                     if(spr<max_sprite) begin
-                        if(!spr_idx_queue_reset && !spr_idx_queue[spr]) begin //if the idx queue is initialized, and there's no sprite in this slot, skip over.
-                            spr<=spr+1;
-                            st<=st;
-                        end else begin
-                            GP9001RAM_GCU_ADDR<= sprite_addr_base;
-                            GP9001RAM2_GCU_ADDR<= sprite_addr_base+3;
-                        end
+                        GP9001RAM_GCU_ADDR<= sprite_addr_base;
+                        GP9001RAM2_GCU_ADDR<= sprite_addr_base+3;
                     end else begin
-                        if(spr_idx_queue_reset) spr_idx_queue_reset<=0; //queue is initialized completely on first line.
-
                         if(sprite_queue_n == 0) begin
                             busy<=0;
                             start<=1'b0;
@@ -333,10 +316,6 @@ always @(posedge CLK96, posedge RESET96) begin
                 end
                 2: begin //check if the sprite is active
                     if(GP9001RAM_GCU_DOUT[15]) begin //sprite is active
-                        if(spr_idx_queue_reset) begin //fill spr idx queue on first line.
-                            spr_idx_queue[spr]<=1;
-                        end
-
                         mc=GP9001RAM_GCU_DOUT[14]; //is a multiconnected sprite
                         yfl= GP9001RAM_GCU_DOUT[13]; //is y-flipped
                         xfl= GP9001RAM_GCU_DOUT[12]; //is x-flipped
@@ -387,6 +366,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         sprite_queue_i<=0;
                         tx<=0;
                         spr_x_render<=0;
+                        spr_x_render1 <= 0;
                     end else begin //there are no sprites in this priority level
                         //there are no more priority levels to go, exit
                         busy<=0;
@@ -404,6 +384,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         // $display("render: %d, %d, %d", VRENDER, priority_i, sprite_queue_priority_n_scan_buf_i);
                         spr<=spr_q_out;
                         spr_x_render<=0;
+                        spr_x_render1 <= 0;
                         //it takes 2 clock cycles to get the first data
                     end else begin //if all the sprites have been rendered from this priority level
                         if(pri_has_sprite> 0) begin // and there are still more priority levels to go
@@ -510,6 +491,7 @@ always @(posedge CLK96, posedge RESET96) begin
 
                     //setup conditions for drawing
                     spr_x_render<=0;
+                    spr_x_render1 <= 1;
                     if(xflip) tx<=7;
                     else tx<=0;
 
@@ -545,14 +527,19 @@ always @(posedge CLK96, posedge RESET96) begin
                 16: st<=17; //wait state
                 17: begin //pull the tile slice for a tile in the sprite
                     if(GFX_OK) begin
-                        GFX_CS<=1'b0;
-                        TILE_NUMBER<=0;
-                        TILE_NUMBER_OFFS<=0;
-                        TILE_BANK<=0;
+                        if(spr_x_render1 < (sprite_x_size + 1)) begin //pre-emptively fetch next tile
+                            TILE_NUMBER<=sprite_num;
+                            TILE_NUMBER_OFFS<=tile_offs+32;
+                            TILE_BANK<=sprite_bank;
+                        end else begin
+                            GFX_CS<=1'b0;
+                            TILE_NUMBER<=0;
+                            TILE_NUMBER_OFFS<=0;
+                            TILE_BANK<=0;
+                        end
                         sprite_line<=GFX_DATA;
                         $display("%d, %d, %d, %h, %h %h", VRENDER, sprite_x_pos, sprite_x_size, TILE_NUMBER, TILE_NUMBER_OFFS, GFX_DATA);
                         // $display("%d %d %d", tiles_across, tiles_down, cur_row_lines_down);
-                        GFX_CS<=1'b0;
                         st<=22;
                         buf_we<=1'b1;
                         if(xflip) tx<=7;
@@ -584,8 +571,10 @@ always @(posedge CLK96, posedge RESET96) begin
                     buf_we<=1'b0;
                     if(xflip) tx<=7;
                     else tx<=0;
+                    if(spr_x_render1 < (sprite_x_size + 1)) st<=17;
+                    else st<=15;
                     spr_x_render<=spr_x_render+1;
-                    st<=15;
+                    spr_x_render1<=spr_x_render1+1;
                 end
             endcase
         end else begin
