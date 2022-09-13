@@ -345,7 +345,7 @@ always @(posedge CLK96, posedge RESET96) begin
                                             (GP9001RAM2_GCU_DOUT[15:7] + SPRITE_SCROLL_Y + SPRITE_SCROLL_YOFFS) & 'h1FF :
                                             (multiconnector_y + GP9001RAM2_GCU_DOUT[15:7]) & 'h1FF;
                         
-                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t+1) << 3);
+                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t+1) << 3) + 1;
                         
                         if(sprite_y_pos_t > 384 || (sprite_y_pos_t > 448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
                         
@@ -501,6 +501,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         else begin
                             sprite_y_pos_t=$signed(sprite_y_pos - ((sprite_y_size + 1) << 3));
                         end
+                        sprite_y_pos_t = sprite_y_pos_t+1;
                     end
 
                     sprite_y_pos<=sprite_y_pos_t;
