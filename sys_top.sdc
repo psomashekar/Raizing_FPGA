@@ -11,8 +11,8 @@ set_multicycle_path -from [get_clocks {SDRAM_CLK}] -to [get_clocks {emu|pll|raiz
 set_multicycle_path -from [get_clocks {SDRAM_CLK}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -hold -end 2
 
 #sdram timing
-set_input_delay -max -clock SDRAM_CLK 6.4ns [get_ports SDRAM_DQ[*]]
-set_input_delay -min -clock SDRAM_CLK 3.7ns [get_ports SDRAM_DQ[*]]
+# set_input_delay -max -clock SDRAM_CLK 6.4ns [get_ports SDRAM_DQ[*]]
+# set_input_delay -min -clock SDRAM_CLK 3.7ns [get_ports SDRAM_DQ[*]]
 
 #raizing obj
 set_multicycle_path -from {*|raizing_video:u_video|raizing_gcu:u_gcu|jtframe_dual_ram:u_spriteram2|jtframe_dual_ram_cen:u_ram|altsyncram:mem_rtl_0|altsyncram_tsi1:auto_generated|*} -to {*|raizing_video:u_video|raizing_obj:u_obj|sprite_queue_priority_n[*]} -setup -end 2
