@@ -125,3 +125,11 @@ set_false_path  -from  [get_clocks {FPGA_CLK1_50}]  -to  [get_clocks {emu|pll|ra
 set_false_path -to [get_keepers {*altera_std_synchronizer:*|din_s1}]
 
 set_false_path -from [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}]
+
+#special
+create_generated_clock -source [get_pins {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -divide_by 1 {emu:emu|jtframe_mister:u_frame|jtframe_joymux:u_joymux|joy_db15:u_db15|JCLOCKS[4]}
+create_generated_clock -name YMZ280B_STATEREG -source [get_pins {emu|pll|raizingpll_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}] -divide_by 1 {emu:emu|bakraid_game:u_game|bakraid_sound:u_sound|YMZ280B:u_ymz280b|ChannelController:channelCtrl|AudioPipeline:audioPipeline|stateReg.010}
+set_multicycle_path -from [get_clocks {YMZ280B_STATEREG}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -setup -end 2
+set_multicycle_path -from [get_clocks {YMZ280B_STATEREG}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}] -setup -end 2
+set_multicycle_path -from [get_clocks {YMZ280B_STATEREG}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[4].gpll~PLL_OUTPUT_COUNTER|divclk}] -hold -end 2
+set_multicycle_path -from [get_clocks {YMZ280B_STATEREG}] -to [get_clocks {emu|pll|raizingpll_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}] -hold -end 2
