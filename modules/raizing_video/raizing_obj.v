@@ -81,7 +81,7 @@ reg [8:0] sprite_queue_priority_n_scan_buf_i = 0;
 reg [4:0] priority_i = 0;
 reg [8:0] spr_scan_i = 0;
 
-reg [4:0] spr_x_render = 0, spr_x_render1 = 0;
+reg [4:0] spr_x_render = 0;
 
 //attribute vars
 reg [63:0] sprite_attributes = 64'h0 /* synthesis keep preserve noprune*/;
@@ -187,7 +187,6 @@ always @(posedge CLK96, posedge RESET96) begin
         clr<=1'b1;
         clr_addr<=0;
         spr_x_render <= 0;
-        spr_x_render1 <= 0;
         sprite_attributes <= 64'h0;
         palette <= 0;
         sprite_num <= 0;
@@ -255,7 +254,6 @@ always @(posedge CLK96, posedge RESET96) begin
             yfl=0;
             xfl=0;
             spr_x_render <= 0;
-            spr_x_render1 <= 0;
             sprite_attributes <= 64'h0;
             palette <= 0;
             sprite_num <= 0;
@@ -337,27 +335,26 @@ always @(posedge CLK96, posedge RESET96) begin
                         if(spr_idx_queue_reset) begin //fill spr idx queue on first line.
                             spr_idx_queue[spr]<=1;
                         end
-                        
                         mc=GP9001RAM_GCU_DOUT[14]; //is a multiconnected sprite
                         yfl= GP9001RAM_GCU_DOUT[13]; //is y-flipped
                         xfl= GP9001RAM_GCU_DOUT[12]; //is x-flipped
                         priority_l= GP9001RAM_GCU_DOUT[11:8]; //get the sprite priority
 
-                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0] + 1;
+                        sprite_y_size_t = GP9001RAM2_GCU_DOUT[3:0];
                         sprite_y_pos_t = !mc ? 
                                             (GP9001RAM2_GCU_DOUT[15:7] + SPRITE_SCROLL_Y + SPRITE_SCROLL_YOFFS) & 'h1FF :
                                             (multiconnector_y + GP9001RAM2_GCU_DOUT[15:7]) & 'h1FF;
                         
-                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t) << 3);
+                        if(yfl) sprite_y_pos_t=sprite_y_pos_t-((sprite_y_size_t+1) << 3);
                         
                         if(sprite_y_pos_t > 384 || (sprite_y_pos_t > 448 && yfl)) sprite_y_pos_t = sprite_y_pos_t - 'h200;
                         
-                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + (sprite_y_size_t << 3))) begin 
-                            sprite_y_size_t = sprite_y_size_t - (-sprite_y_pos_t>>3);
+                        if(sprite_y_pos_t < 0 && $signed(VRENDER) < $signed(sprite_y_pos_t + ((sprite_y_size_t+1) << 3))) begin 
+                            sprite_y_size_t = (sprite_y_size_t+1) - (-sprite_y_pos_t>>3);
                             sprite_y_pos_t = 0;
                         end
 
-                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + (sprite_y_size_t << 3))) begin
+                        if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + ((sprite_y_size_t+1) << 3))) begin
                             $display("queue: %d, %d, %d, %h, %h, %h", VRENDER, sprite_y_size_t, sprite_y_pos_t, sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8]+1, priority_l, spr[7:0]);
                             wr_spr_q <= spr[7:0];
                             wr_spr_q_addr<=((priority_l<<11) | sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]);
@@ -388,7 +385,6 @@ always @(posedge CLK96, posedge RESET96) begin
                         sprite_queue_i<=0;
                         tx<=0;
                         spr_x_render<=0;
-                        spr_x_render1 <= 0;
                     end else begin //there are no sprites in this priority level
                         //there are no more priority levels to go, exit
                         busy<=0;
@@ -406,7 +402,6 @@ always @(posedge CLK96, posedge RESET96) begin
                         // $display("render: %d, %d, %d", VRENDER, priority_i, sprite_queue_priority_n_scan_buf_i);
                         spr<=spr_q_out;
                         spr_x_render<=0;
-                        spr_x_render1 <= 0;
                         //it takes 2 clock cycles to get the first data
                     end else begin //if all the sprites have been rendered from this priority level
                         if(pri_has_sprite> 0) begin // and there are still more priority levels to go
@@ -513,7 +508,6 @@ always @(posedge CLK96, posedge RESET96) begin
 
                     //setup conditions for drawing
                     spr_x_render<=0;
-                    spr_x_render1 <= 1;
                     if(xflip) tx<=7;
                     else tx<=0;
 
@@ -548,28 +542,40 @@ always @(posedge CLK96, posedge RESET96) begin
                 end
                 16: st<=17; //wait state
                 17: begin //pull the tile slice for a tile in the sprite
-                    if(GFX_OK) begin
-                        if(spr_x_render1 < (sprite_x_size + 1)) begin //pre-emptively fetch next tile
-                            TILE_NUMBER<=sprite_num;
-                            TILE_NUMBER_OFFS<=tile_offs+32;
-                            TILE_BANK<=sprite_bank;
-                        end else begin
+                    if(spr_x_render == (sprite_x_size + 1)) begin
+                        st<=5;
+                        tx<=0;
+                        GFX_CS<=1'b0;
+                        spr_x_render<=0;
+                        buf_we<=1'b0;
+                        sprite_queue_i<=sprite_queue_i+1;
+                    end else begin
+                        if(GFX_OK) begin
                             GFX_CS<=1'b0;
                             TILE_NUMBER<=0;
                             TILE_NUMBER_OFFS<=0;
                             TILE_BANK<=0;
+                            sprite_line<=GFX_DATA;
+                            $display("%d, %d, %d, %h, %h %h", VRENDER, sprite_x_pos, sprite_x_size, TILE_NUMBER, TILE_NUMBER_OFFS, GFX_DATA);
+                            // $display("%d %d %d", tiles_across, tiles_down, cur_row_lines_down);
+                            st<=18;
+                            buf_we<=1'b1;
+                            if(xflip) tx<=7;
+                            else tx<= 0;
+                            drawn_pixels = 8'h0;
+                        end else begin //the sprite was not ready yet from sdram.
+                            st<=st;
                         end
-                        sprite_line<=GFX_DATA;
-                        $display("%d, %d, %d, %h, %h %h", VRENDER, sprite_x_pos, sprite_x_size, TILE_NUMBER, TILE_NUMBER_OFFS, GFX_DATA);
-                        // $display("%d %d %d", tiles_across, tiles_down, cur_row_lines_down);
-                        st<=22;
-                        buf_we<=1'b1;
-                        if(xflip) tx<=7;
-                        else tx<= 0;
-                        drawn_pixels = 8'h0;
-                    end else begin //the sprite was not ready yet from sdram.
-                        st<=st;
                     end
+                end
+                18: begin
+                    if(spr_x_render + 1 < (sprite_x_size + 1)) begin //pre-emptive
+                        GFX_CS<=1'b1;
+                        TILE_NUMBER<=sprite_num;
+                        TILE_NUMBER_OFFS<=tile_offs+32;
+                        TILE_BANK<=sprite_bank;
+                    end
+                    st<=22;
                 end
                 22: begin //draw the slice, every slice is 8 pixels
                     if(xflip) tx<=tx-1;
@@ -593,10 +599,8 @@ always @(posedge CLK96, posedge RESET96) begin
                     buf_we<=1'b0;
                     if(xflip) tx<=7;
                     else tx<=0;
-                    if(spr_x_render1 < (sprite_x_size + 1)) st<=17;
-                    else st<=15;
                     spr_x_render<=spr_x_render+1;
-                    spr_x_render1<=spr_x_render1+1;
+                    st<=17;
                 end
             endcase
         end else begin
