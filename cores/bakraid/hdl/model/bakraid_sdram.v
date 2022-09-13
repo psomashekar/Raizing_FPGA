@@ -241,7 +241,7 @@ jtframe_rom_4slots #(
 
 	.SLOT2_AW    (22), //PCM rom 6 (8 bit addressing)
 	.SLOT2_DW    (8),
-	.SLOT2_LATCH (1),
+	.SLOT2_LATCH (0),
 	.SLOT2_DOUBLE(1),
 
 	.SLOT3_AW    (17), //z80 rom mirror (8 bit addressing)
@@ -293,22 +293,22 @@ jtframe_rom_4slots #(
 	.SLOT0_AW    (22), //first half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT0_DW    (32),
 	.SLOT0_DOUBLE(1),
-	.SLOT0_LATCH (1),
+	.SLOT0_LATCH (0),
 
 	.SLOT1_AW    (22), //first half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT1_DW    (32),
 	.SLOT1_DOUBLE(1),
-	.SLOT1_LATCH (1),
+	.SLOT1_LATCH (0),
 
 	.SLOT2_AW    (22), //first half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT2_DW    (32),
 	.SLOT2_DOUBLE(1),
-	.SLOT2_LATCH (1),
+	.SLOT2_LATCH (0),
 
 	.SLOT3_AW    (22), //first half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT3_DW    (32),
 	.SLOT3_DOUBLE(1),
-	.SLOT3_LATCH (1)
+	.SLOT3_LATCH (0)
 ) u_bank1 (
     .rst         (RESET),
 	.clk         (CLK),
@@ -346,22 +346,22 @@ jtframe_rom_4slots #(
 	.SLOT0_AW    (22), //second half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT0_DW    (32),
 	.SLOT0_DOUBLE(1),
-	.SLOT0_LATCH (1),
+	.SLOT0_LATCH (0),
 
 	.SLOT1_AW    (22), //first half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT1_DW    (32),
 	.SLOT1_DOUBLE(1),
-	.SLOT1_LATCH (1),
+	.SLOT1_LATCH (0),
 
 	.SLOT2_AW    (22), //first half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT2_DW    (32),
 	.SLOT2_DOUBLE(1),
-	.SLOT2_LATCH (1),
+	.SLOT2_LATCH (0),
 	
 	.SLOT3_AW    (22), //first half of gfx (8MB) (16 bit addressing, but the words are swapped.)
 	.SLOT3_DW    (32),
 	.SLOT3_DOUBLE(1),
-	.SLOT3_LATCH (1)
+	.SLOT3_LATCH (0)
 ) u_bank2 (
     .rst         (RESET),
 	.clk         (CLK),
