@@ -31,7 +31,9 @@ module raizing_obj (
     input HB,
     input VB,
     input FLIPX,
+    //optimizations
     input SHIFT_SPRITE_PRI,
+    input FAST_OBJ_QUEUE,
 
     //interface with GP9001 RAM Mirror
     output reg [12:0] GP9001RAM_GCU_ADDR,
@@ -285,7 +287,7 @@ always @(posedge CLK96, posedge RESET96) begin
             case(st)
                 0: begin //begin scanning the sprite position
                     if(spr<max_sprite) begin
-                        if(!spr_idx_queue_reset && !spr_idx_queue[spr]) begin //if the idx queue is initialized, and there's no sprite in this slot, skip over.
+                        if(!spr_idx_queue_reset && !spr_idx_queue[spr] && FAST_OBJ_QUEUE) begin //if the idx queue is initialized, and there's no sprite in this slot, skip over.
                             spr<=spr+1;
                             st<=st;
                         end else begin
