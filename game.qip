@@ -4,6 +4,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE modules/fx68k/fx68kAlu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE modules/fx68k/uaddrPla.sv
 set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/cpu/jtframe_68kdma.v
 set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/cpu/jtframe_68kdtack.v
+set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/cpu/jtframe_68kdtack_wait.v
 set_global_assignment -name VERILOG_FILE modules/jtframe/hdl/cpu/jtframe_virq.v
 
 #video
