@@ -425,11 +425,19 @@ wire int1, int2;
 //address bits 19 to 23 go to the E68DEC1B chip.
 
 //68k cpu running at 16mhz
-jtframe_68kdtack #(.W(10)) u_dtack(
+//copy protection
+wire freeplay_set = &DIPSW_A[4:2];
+wire cen16_0, cen16b_0, dtack_n_0,
+     cen16_1, cen16b_1, dtack_n_1;
+assign DTACKn = freeplay_set ? dtack_n_0 : dtack_n_1;
+assign CEN16 = freeplay_set ? cen16_0 : cen16_1;
+assign CEN16B = freeplay_set ? cen16b_0 : cen16b_1;
+
+jtframe_68kdtack_wait #(.W(10)) u_dtackw(
     .rst        (RESET96),
     .clk        (CLK96),
-    .cpu_cen    (CEN16),
-    .cpu_cenb   (CEN16B),
+    .cpu_cen    (cen16_0),
+    .cpu_cenb   (cen16b_0),
     .bus_cs     (bus_cs),
     .bus_busy   (bus_busy),
     .bus_legit  (1'b0),
@@ -437,7 +445,28 @@ jtframe_68kdtack #(.W(10)) u_dtack(
     .DSn        ({UDSn, LDSn}),
     .num        (10'd32),
     .den        (10'd189),
-    .DTACKn     (DTACKn),
+    .wait2(0),
+    .wait3(0),
+    .DTACKn     (dtack_n_0),
+    // unused
+    .fave       (),
+    .fworst     (),
+    .frst       ()
+);
+
+jtframe_68kdtack #(.W(10)) u_dtack(
+    .rst        (RESET96),
+    .clk        (CLK96),
+    .cpu_cen    (cen16_1),
+    .cpu_cenb   (cen16b_1),
+    .bus_cs     (bus_cs),
+    .bus_busy   (bus_busy),
+    .bus_legit  (1'b0),
+    .ASn        (ASn),
+    .DSn        ({UDSn, LDSn}),
+    .num        (10'd32),
+    .den        (10'd189),
+    .DTACKn     (dtack_n_1),
     // unused
     .fave       (),
     .fworst     (),
