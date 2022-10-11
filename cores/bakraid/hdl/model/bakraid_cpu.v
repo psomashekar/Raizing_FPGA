@@ -317,7 +317,7 @@ always @(posedge CLK96, posedge RESET96) begin
 end  
 
 //cpu bus actions for IO
-wire inta_n = ~&{ FC0, FC1, FC2, A[19:16] }; // ctrl like M68000's manual
+wire inta_n = ~&{ FC0, FC1, FC2, ~ASn }; // ctrl like M68000's manual
 wire snd_irq_ack;
 
 jtframe_ff u_nmi_ff(
@@ -433,7 +433,14 @@ assign DTACKn = freeplay_set ? dtack_n_0 : dtack_n_1;
 assign CEN16 = freeplay_set ? cen16_0 : cen16_1;
 assign CEN16B = freeplay_set ? cen16b_0 : cen16b_1;
 
-jtframe_68kdtack_wait #(.W(10)) u_dtackw(
+
+reg snd_bus;
+always @(posedge CLK96, posedge RESET96) begin
+    if(RESET96) snd_bus<=1;
+    else if(CEN16) snd_bus<=Z80WAIT;
+end
+wire dtack_clr = sel_z80 & snd_bus;
+jtframe_68kdtack_wait #(.W(8)) u_dtackw(
     .rst        (RESET96),
     .clk        (CLK96),
     .cpu_cen    (cen16_0),
@@ -441,10 +448,10 @@ jtframe_68kdtack_wait #(.W(10)) u_dtackw(
     .bus_cs     (bus_cs),
     .bus_busy   (bus_busy),
     .bus_legit  (1'b0),
-    .ASn        (ASn),
+    .ASn        (ASn | dtack_clr ),
     .DSn        ({UDSn, LDSn}),
-    .num        (10'd32),
-    .den        (10'd189),
+    .num        (7'd32),
+    .den        (8'd189),
     .wait2(0),
     .wait3(0),
     .DTACKn     (dtack_n_0),
@@ -454,7 +461,7 @@ jtframe_68kdtack_wait #(.W(10)) u_dtackw(
     .frst       ()
 );
 
-jtframe_68kdtack #(.W(10)) u_dtack(
+jtframe_68kdtack #(.W(8)) u_dtack(
     .rst        (RESET96),
     .clk        (CLK96),
     .cpu_cen    (cen16_1),
@@ -462,10 +469,10 @@ jtframe_68kdtack #(.W(10)) u_dtack(
     .bus_cs     (bus_cs),
     .bus_busy   (bus_busy),
     .bus_legit  (1'b0),
-    .ASn        (ASn),
+    .ASn        (ASn | dtack_clr ),
     .DSn        ({UDSn, LDSn}),
-    .num        (10'd32),
-    .den        (10'd189),
+    .num        (7'd32),
+    .den        (8'd189),
     .DTACKn     (dtack_n_1),
     // unused
     .fave       (),
