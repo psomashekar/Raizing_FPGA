@@ -589,7 +589,7 @@ always @(posedge CLK96, posedge RESET96) begin
                     if( sprite_code > 0 && buf_code>=0 && buf_code<320) begin //if the sprite is not blank
                         drawn_pixels[tx] = 1'b1;
                         buf_addr<=(FLIPX ? 319-buf_code : buf_code)&'h1FF;
-                        buf_data<=((SHIFT_SPRITE_PRI ? sprite_attributes[59:56] + 1 : sprite_attributes[59:56]) << 12) + (palette&'h7F0)+sprite_code;
+                        buf_data<=((SHIFT_SPRITE_PRI ? sprite_attributes[59:56] + 1 : sprite_attributes[59:56]) << 11) + (palette&'h7F0)+sprite_code;
                     end else begin //it is a blank sprite
                         //do nothing, because other layers of sprites might be on top.
                     end
