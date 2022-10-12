@@ -347,7 +347,7 @@ always @(posedge CLK96) begin
 end  
 
 //cpu bus actions for IO
-wire inta_n = ~&{ FC0, FC1, FC2, A[19:16] }; // ctrl like M68000's manual
+wire inta_n = ~&{ FC0, FC1, FC2, ~ASn }; // ctrl like M68000's manual
 wire snd_irq_ack;
 
 jtframe_ff u_nmi_ff(
@@ -445,7 +445,7 @@ jtframe_virq u_virq(
 //address bits 19 to 23 go to the E68DEC1B chip.
 
 //68k cpu running at 16mhz
-jtframe_68kdtack #(.W(10)) u_dtack(
+jtframe_68kdtack #(.W(8)) u_dtack(
     .rst        (RESET96),
     .clk        (CLK96),
     .cpu_cen    (CEN16),
@@ -455,8 +455,8 @@ jtframe_68kdtack #(.W(10)) u_dtack(
     .bus_legit  (1'b0),
     .ASn        (ASn),
     .DSn        ({UDSn, LDSn}),
-    .num        (10'd32),
-    .den        (10'd189),
+    .num        (7'd32),
+    .den        (8'd189),
     .DTACKn     (DTACKn),
     // unused
     .fave       (),
