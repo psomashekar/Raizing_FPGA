@@ -73,7 +73,7 @@ wire [7:0] nb_pixels = {|GFX_DATA[31:28], |GFX_DATA[27:24], |GFX_DATA[23:20], |G
                         |GFX_DATA[15:12], |GFX_DATA[11:8], |GFX_DATA[7:4], |GFX_DATA[3:0]};
 reg [7:0] drawn_pixels = 8'h0;
 //processing vars
-reg [4:0] priority_l;
+reg [3:0] priority_l;
 reg signed [4:0] sprite_y_size_t;
 reg signed [8:0] sprite_y_pos_t;
 reg [8:0] sprite_queue_n = 0;
@@ -131,13 +131,13 @@ reg clr=0;
 reg [8:0] clr_addr = 0;
 
 reg [7:0] wr_spr_q;
-reg [14:0] wr_spr_q_addr;
-wire [14:0] rd_spr_q_addr = (priority_i*2048) + sprite_queue_i;
+reg [11:0] wr_spr_q_addr;
+wire [11:0] rd_spr_q_addr = (priority_i*256) + sprite_queue_i;
 reg spr_q_we;
 wire [7:0] spr_q_out;
 
 
-jtframe_dual_ram #(.dw(8), .aw(15)) u_sprite_pri_q(
+jtframe_dual_ram #(.dw(8), .aw(12)) u_sprite_pri_q(
     .clk0(CLK96),
     .clk1(CLK96),
     .data0  (wr_spr_q),
@@ -359,11 +359,11 @@ always @(posedge CLK96, posedge RESET96) begin
                         if(VRENDER >= sprite_y_pos_t && VRENDER < (sprite_y_pos_t + ((sprite_y_size_t+1) << 3))) begin
                             $display("queue: %d, %d, %d, %h, %h, %h", VRENDER, sprite_y_size_t, sprite_y_pos_t, sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8]+1, priority_l, spr[7:0]);
                             wr_spr_q <= spr[7:0];
-                            wr_spr_q_addr<=((priority_l<<11) | sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]);
+                            wr_spr_q_addr<=((priority_l*256) + sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]);
                             pri_has_sprite[priority_l]<=1'b1;
 
                             sprite_queue_priority_n[((priority_l+1)<<3)-1 -:8] <= sprite_queue_priority_n[((priority_l+1)<<3)-1 -: 8]+1;
-                            sprite_queue_n<=sprite_queue_n+1;                            
+                            sprite_queue_n<=sprite_queue_n+1;
                         end
 
                         st<=0;//go to next sprite
