@@ -168,6 +168,7 @@ end
 reg [255:0] spr_idx_queue = 256'd0;
 reg spr_idx_queue_reset = 1;
 
+reg [319:0] intra_obj_x = 320'd0;
 always @(posedge CLK96, posedge RESET96) begin
     if(RESET96) begin
         st<=0;
@@ -218,6 +219,7 @@ always @(posedge CLK96, posedge RESET96) begin
         spr_q_we<=1'b0;
         spr_idx_queue <= 256'd0;
         spr_idx_queue_reset <= 1'b1;
+        intra_obj_x <= 320'd0;
     end else begin
         // $display("H:%d", H);
         last_HB    <= HB;
@@ -279,6 +281,7 @@ always @(posedge CLK96, posedge RESET96) begin
             GP9001RAM2_GCU_ADDR<=0;
             pri_has_sprite <= 16'd0;
             spr_q_we<=1'b0;
+            intra_obj_x <= 320'd0;
         end else if(busy) begin
             st<=st+1;
             clr<=1'b1;
@@ -380,11 +383,12 @@ always @(posedge CLK96, posedge RESET96) begin
                 4: begin
                     pri_has_sprite[priority_i]<=0;
                     if(sprite_queue_priority_n[((priority_i+1)<<3)-1 -: 8] > 0 && priority_i<max_priority) begin //if there are sprites in this priority level
+                        intra_obj_x<={320{1'b0}};
                         // $display("scan: %d", priority_i);
                         sprite_queue_priority_n_scan_buf_i <= sprite_queue_priority_n[((priority_i+1)<<3)-1 -: 8];
                         st<=5;
                         //setup the conditions for rendering
-                        sprite_queue_i<=0;
+                        sprite_queue_i<=sprite_queue_priority_n[((priority_i+1)<<3)-1 -: 8]-1;
                         tx<=0;
                         spr_x_render<=0;
                     end else begin //there are no sprites in this priority level
@@ -531,7 +535,7 @@ always @(posedge CLK96, posedge RESET96) begin
                             GFX_CS<=1'b0;
                             spr_x_render<=0;
                             buf_we<=1'b0;
-                            sprite_queue_i<=sprite_queue_i+1;
+                            sprite_queue_i<=sprite_queue_i-1;
                         end
                     end else begin //all the tiles in the sprite have been drawn, go to the next sprite in the queue
                         // $display("all tiles drawn, next sprite");
@@ -540,7 +544,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         GFX_CS<=1'b0;
                         spr_x_render<=0;
                         buf_we<=1'b0;
-                        sprite_queue_i<=sprite_queue_i+1;
+                        sprite_queue_i<=sprite_queue_i-1;
                     end
                 end
                 16: st<=17; //wait state
@@ -551,7 +555,7 @@ always @(posedge CLK96, posedge RESET96) begin
                         GFX_CS<=1'b0;
                         spr_x_render<=0;
                         buf_we<=1'b0;
-                        sprite_queue_i<=sprite_queue_i+1;
+                        sprite_queue_i<=sprite_queue_i-1;
                     end else begin
                         if(GFX_OK) begin
                             GFX_CS<=1'b0;
@@ -587,9 +591,12 @@ always @(posedge CLK96, posedge RESET96) begin
                     // tx <= (xflip ? tx - 1 : tx + 1);
                     
                     if( sprite_code > 0 && buf_code>=0 && buf_code<320) begin //if the sprite is not blank
-                        drawn_pixels[tx] = 1'b1;
-                        buf_addr<=(FLIPX ? 319-buf_code : buf_code)&'h1FF;
-                        buf_data<=((SHIFT_SPRITE_PRI ? sprite_attributes[59:56] + 1 : sprite_attributes[59:56]) << 11) + (palette&'h7F0)+sprite_code;
+                        if(intra_obj_x[(FLIPX ? 319-buf_code : buf_code)&'h1FF] == 0) begin
+                            drawn_pixels[tx] = 1'b1;
+                            intra_obj_x[(FLIPX ? 319-buf_code : buf_code)&'h1FF] <= 1;
+                            buf_addr<=(FLIPX ? 319-buf_code : buf_code)&'h1FF;
+                            buf_data<=((SHIFT_SPRITE_PRI ? sprite_attributes[59:56] + 1 : sprite_attributes[59:56]) << 11) + (palette&'h7F0)+sprite_code;
+                        end
                     end else begin //it is a blank sprite
                         //do nothing, because other layers of sprites might be on top.
                     end
