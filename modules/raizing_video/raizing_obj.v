@@ -501,13 +501,15 @@ always @(posedge CLK96, posedge RESET96) begin
                     end
 
                     if(yflip) begin
-                        if($signed(sprite_y_pos-((sprite_y_size + 1) << 3)) > 384) begin
+                        if($signed(sprite_y_pos-((sprite_y_size + 1) << 3) + 1) > 384) begin
                              sprite_y_pos_t = $signed(sprite_y_pos - 'h200);
                         end
                         else begin
                             sprite_y_pos_t=$signed(sprite_y_pos - ((sprite_y_size + 1) << 3));
                         end
                         sprite_y_pos_t = sprite_y_pos_t+1;
+                    end else begin
+                        if(sprite_y_pos > 384) sprite_y_pos_t = $signed(sprite_y_pos - 'h200);
                     end
 
                     sprite_y_pos<=sprite_y_pos_t;

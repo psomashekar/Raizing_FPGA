@@ -404,8 +404,10 @@ wire scroll2ram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1000 && GP9001RAM_ADDR
 wire spriteram_we = GP9001RAM_WE && (GP9001RAM_ADDR>=14'h1800 && GP9001RAM_ADDR<14'h1C00);
 
 //sprite lag fix
-wire spritelag_en = (GAME == GAREGGA);
-wire [1:0] spritelag_amt = GAME == GAREGGA ? 1 : 0; // garegga 2 frames behind live
+wire spritelag_en = (GAME == GAREGGA || GAME == SSTRIKER || GAME == KINGDMGP);
+wire [1:0] spritelag_amt = GAME == GAREGGA ? 1 : 
+                           GAME == SSTRIKER ? 0 : 
+                           GAME == KINGDMGP ? 0 : 0; // garegga 2 frames behind live
 
 reg [1:0] cur_buf = 0;
 wire [1:0] cur_buf_rd = cur_buf + (spritelag_en ? (~spritelag_amt[1:0] + 1) : 0);
