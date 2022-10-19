@@ -423,6 +423,13 @@ end
 //address bits 19 to 23 go to the E68DEC1B chip.
 
 //68k cpu running at 16mhz
+reg snd_bus;
+always @(posedge CLK96, posedge RESET96) begin
+    if(RESET96) snd_bus<=1;
+    else if(CEN16) snd_bus<=Z80WAIT;
+end
+wire dtack_clr = sel_z80 & snd_bus;
+
 wire int1, int2;
 jtframe_virq u_virq(
     .rst        ( RESET96       ),
@@ -446,7 +453,7 @@ jtframe_68kdtack #(.W(8)) u_dtack(
     .bus_cs     (bus_cs),
     .bus_busy   (bus_busy),
     .bus_legit  (1'b0),
-    .ASn        (ASn),
+    .ASn        (ASn | dtack_clr),
     .DSn        ({UDSn, LDSn}),
     .num        (7'd32),
     .den        (8'd189),
