@@ -325,8 +325,8 @@ jtframe_ff u_nmi_ff(
     .rst      ( RESET96         ),
     .cen      ( 1'b1        ),
     .din      ( 1'b1        ),
-    .q        (             ),
-    .qn       ( snd_irq_ack       ),
+    .q        ( snd_irq_ack            ),
+    .qn       (        ),
     .set      ( 1'b0        ),    // active high
     .clr      ( batrider_clr_sndirq_w_cs ),    // active high
     .sigedge  ( SNDIRQ ) // signal whose edge will trigger the FF
@@ -420,18 +420,30 @@ always @(posedge CLK96) begin
     end
 end
 
-wire int1, int2;
-
 //address bits 19 to 23 go to the E68DEC1B chip.
 
 //68k cpu running at 16mhz
-//copy protection
+wire int1, int2;
+jtframe_virq u_virq(
+    .rst        ( RESET96       ),
+    .clk        ( CLK96       ),
+    .LVBL       ( LVBL      ),
+    .dip_pause  ( DIP_PAUSE ),
+    .skip_en    (    ),
+    .skip_but   (    ),
+    .clr        ( ~inta_n ),
+    .custom_in  ( snd_irq_ack),
+    .blin_n     ( int1      ),
+    .blout_n    (           ),
+    .custom_n   ( int2      )
+);
+
 wire freeplay_set = &DIPSW_A[4:2];
 wire cen16_0, cen16b_0, dtack_n_0,
      cen16_1, cen16b_1, dtack_n_1;
-assign DTACKn = freeplay_set ? dtack_n_0 : dtack_n_1;
-assign CEN16 = freeplay_set ? cen16_0 : cen16_1;
-assign CEN16B = freeplay_set ? cen16b_0 : cen16b_1;
+assign DTACKn = freeplay_set ? dtack_n_1 : dtack_n_1;
+assign CEN16 = freeplay_set ? cen16_1 : cen16_1;
+assign CEN16B = freeplay_set ? cen16b_1 : cen16b_1;
 
 
 reg snd_bus;
@@ -523,8 +535,8 @@ fx68k u_011 (
     .BGn        (BGn),
 
     .DTACKn     (DTACKn),
-    .IPL0n      (VINT),
-    .IPL1n      (snd_irq_ack),
+    .IPL0n      (int1),
+    .IPL1n      (int2),
     .IPL2n      (1'b1),
 
     // Unused
