@@ -228,6 +228,7 @@ always @(posedge CLK96, posedge RESET96) begin
 
         if( (pedg_HB && !VB)  || (((!FLIPX && VRENDER == 0) || (FLIPX && VRENDER == 239)) && pedg_HB)) begin
             start <= 1'b1;
+            busy <= 1'b0;
         end
 
         if(VB && !last_VB) begin //reset the sprite idx queue in vb period once.
@@ -242,8 +243,8 @@ always @(posedge CLK96, posedge RESET96) begin
             spr<=0;
             st<=0;
             priority_l=0;
-            sprite_y_size_t<=0;
-            sprite_y_pos_t<=0;
+            sprite_y_size_t=0;
+            sprite_y_pos_t=0;
             sprite_queue_n<=0;
             sprite_queue_i<=0;
             sprite_queue_priority_n<={max_priority{8'h00}};

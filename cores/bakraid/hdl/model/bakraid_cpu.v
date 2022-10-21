@@ -423,6 +423,13 @@ end
 //address bits 19 to 23 go to the E68DEC1B chip.
 
 //68k cpu running at 16mhz
+reg snd_bus;
+always @(posedge CLK96, posedge RESET96) begin
+    if(RESET96) snd_bus<=1;
+    else if(CEN16) snd_bus<=Z80WAIT;
+end
+wire dtack_clr = sel_z80 & snd_bus;
+
 wire int1, int2;
 jtframe_virq u_virq(
     .rst        ( RESET96       ),
@@ -438,54 +445,19 @@ jtframe_virq u_virq(
     .custom_n   ( int2      )
 );
 
-wire freeplay_set = &DIPSW_A[4:2];
-wire cen16_0, cen16b_0, dtack_n_0,
-     cen16_1, cen16b_1, dtack_n_1;
-assign DTACKn = freeplay_set ? dtack_n_1 : dtack_n_1;
-assign CEN16 = freeplay_set ? cen16_1 : cen16_1;
-assign CEN16B = freeplay_set ? cen16b_1 : cen16b_1;
-
-
-reg snd_bus;
-always @(posedge CLK96, posedge RESET96) begin
-    if(RESET96) snd_bus<=1;
-    else if(CEN16) snd_bus<=Z80WAIT;
-end
-wire dtack_clr = sel_z80 & snd_bus;
-jtframe_68kdtack_wait #(.W(8)) u_dtackw(
-    .rst        (RESET96),
-    .clk        (CLK96),
-    .cpu_cen    (cen16_0),
-    .cpu_cenb   (cen16b_0),
-    .bus_cs     (bus_cs),
-    .bus_busy   (bus_busy),
-    .bus_legit  (1'b0),
-    .ASn        (ASn | dtack_clr ),
-    .DSn        ({UDSn, LDSn}),
-    .num        (7'd32),
-    .den        (8'd189),
-    .wait2(0),
-    .wait3(0),
-    .DTACKn     (dtack_n_0),
-    // unused
-    .fave       (),
-    .fworst     (),
-    .frst       ()
-);
-
 jtframe_68kdtack #(.W(8)) u_dtack(
     .rst        (RESET96),
     .clk        (CLK96),
-    .cpu_cen    (cen16_1),
-    .cpu_cenb   (cen16b_1),
+    .cpu_cen    (CEN16),
+    .cpu_cenb   (CEN16B),
     .bus_cs     (bus_cs),
     .bus_busy   (bus_busy),
     .bus_legit  (1'b0),
-    .ASn        (ASn | dtack_clr ),
+    .ASn        (ASn | dtack_clr),
     .DSn        ({UDSn, LDSn}),
     .num        (7'd32),
     .den        (8'd189),
-    .DTACKn     (dtack_n_1),
+    .DTACKn     (DTACKn),
     // unused
     .fave       (),
     .fworst     (),
