@@ -259,6 +259,7 @@ always @(posedge CLK96, posedge RESET96) begin
 
         if( (pedg_HB && !VB)  || (((!FLIPX && VRENDER == 0) || (FLIPX && VRENDER == 239)) && pedg_HB)) begin
             start <= 1'b1;
+            busy <= 1'b0;
         end
 
         if(start && !busy) begin
