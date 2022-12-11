@@ -8,7 +8,7 @@
     <manufacturer>Raizing / Eighting</manufacturer>
     <players>2</players>
     <joystick>8-way</joystick>
-    <rotation>vertical</rotation>
+    <rotation>vertical (ccw)</rotation>
     <region>Japan</region>
     <platform>Toaplan 2</platform>
     <category>Shoot'em up</category>
