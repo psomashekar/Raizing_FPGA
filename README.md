@@ -1,6 +1,6 @@
-# Raizing MiSTer Cores
+# Raizing FPGA Cores
 
-This project contains the MiSTer core for Raizing boards operating on the Toaplan v2 board platform.
+This project contains the FPGA cores for Raizing boards operating on the Toaplan v2 board platform.
 
 ## Supported Games
 
